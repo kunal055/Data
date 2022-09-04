@@ -1,0 +1,84 @@
+set markup html on spool on
+SPOOL UNDO_INFO.HTML
+set pagesize 200
+set echo on
+
+select * from v$version;
+
+show parameter undo
+
+select tablespace_name,block_size,status,contents,retention,extent_management,status,bigfile,round(max_size/1024/1024) "MAX SIZE (MB)" from dba_tablespaces order by contents,tablespace_name;
+
+select tablespace_name,file_name,round(bytes/1024/1024) "SIZE (MB)",autoextensible,round(maxbytes/1024/1024) "MAX SIZE (MB)", status from dba_data_files where tablespace_name='<UNDOTBS1>' order by tablespace_name;
+
+select max(MAXQUERYLEN), max(TUNED_UNDORETENTION) , max(undoblks), avg (undoblks), avg(MAXQUERYLEN), avg(TUNED_UNDORETENTION) from v$undostat;
+
+select status, round(sum(bytes)/(1024*1024)) size_mb, count(status) number_of_ext
+from dba_undo_extents
+group by status;
+
+SELECT tablespace_name, status, COUNT (*)
+FROM SYS.dba_undo_extents
+GROUP BY tablespace_name, status order by tablespace_name,status;
+
+select to_char(begin_time, 'mm/dd/yyyy hh24:mi:ss') begin_time,
+tuned_undoretention from v$undostat;
+
+select to_char(begin_time, 'mm/dd/yyyy hh24:mi:ss') begin_time,
+to_char(end_time, 'mm/dd/yyyy hh24:mi:ss') end_time,
+undotsn, undoblks, txncount, maxconcurrency as "MAXCON",
+maxquerylen, tuned_undoretention
+from v$undostat order by 1;
+
+select * from v$undostat;
+
+column UNXPSTEALCNT heading "# Unexpired|Stolen"
+column EXPSTEALCNT heading "# Expired|Reused"
+column SSOLDERRCNT heading "ORA-1555|Error"
+column NOSPACEERRCNT heading "Out-Of-space|Error"
+column MAXQUERYLEN heading "Max Query|Length"
+select inst_id, to_char(begin_time,'mm/dd/yyyy hh24:mi') begin_time,
+unxpstealcnt, expstealcnt , ssolderrcnt, nospaceerrcnt, maxquerylen, tuned_undoretention
+from gv$undostat
+order by inst_id, begin_time;
+
+select tablespace_name,file_name,round(bytes/1024/1024) "SIZE (MB)",autoextensible,round(maxbytes/1024/1024) "MAX SIZE (MB)", status
+from dba_data_files order by tablespace_name;
+
+select Total.tablespace_name "TBS NAME",
+round(Free_space,2) "Free space GB",
+round((total_space - free_space),2) "Used Space GB",
+total_space "Total size GB",
+round(round((total_space - free_space),2)/total_space*100,2) used_perc
+from (select tablespace_name,sum(bytes)/(1024*1024*1024) free_space from dba_free_space group by tablespace_name) free,
+(select tablespace_name,round(sum(bytes)/(1024*1024*1024),2) TOTAL_SPACE from dba_data_files group by tablespace_name)
+Total where free.Tablespace_name = Total.tablespace_name;
+
+
+SELECT s.sid, s.serial#, s.username, u.segment_name, count(u.extent_id) "Extent Count", t.used_ublk, t.used_urec, s.program
+FROM v$session s, v$transaction t, dba_undo_extents u
+WHERE s.taddr = t.addr and u.segment_name like '_SYSSMU'||t.xidusn||'_%$' and u.status = 'ACTIVE'
+GROUP BY s.sid, s.serial#, s.username, u.segment_name, t.used_ublk, t.used_urec, s.program
+ORDER BY t.used_ublk desc, t.used_urec desc, s.sid, s.serial#, s.username, s.program;
+
+select b.name "UNDO Segment Name", b.inst# "Instance ID", b.status$ STATUS, a.ktuxesiz "UNDO Blocks", a.ktuxeusn, a.ktuxeslt xid_slot, a.ktuxesqn xid_seq
+from x$ktuxe a, undo$ b
+where a.ktuxesta = 'ACTIVE' and a.ktuxecfl like '%DEAD%' and a.ktuxeusn = b.us#;
+
+SELECT (UR * (UPS * DBS))/1024/1024 AS "MBytes"
+FROM (SELECT value AS UR FROM v$parameter WHERE name = 'undo_retention'),
+(SELECT undoblks/((end_time-begin_time)*86400) AS UPS
+FROM v$undostat
+WHERE undoblks = (SELECT MAX(undoblks) FROM v$undostat)),
+(SELECT block_size AS DBS
+FROM dba_tablespaces
+WHERE tablespace_name = (SELECT UPPER(value) FROM v$parameter WHERE name = 'undo_tablespace'));
+
+spool off
+set markup html off spool off
+
+
+/tmp/undo_issue
+
+
+cp im1p_ora_124648.trc im1p_ora_2324.trm im1p_ora_2324.trc im1p_ora_109166.trm im1p_ora_109166.trc im1p_ora_6669.trm im1p_ora_6669.trc im1p_ora_6687.trm im1p_ora_6687.trc im1p_ora_10431.trm im1p_ora_10431.trc im1p_ora_84664.trm /tmp/undo_issue

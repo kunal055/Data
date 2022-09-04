@@ -1,0 +1,240 @@
+
+Solution
+ 	1) Stop the managed recovery process (MRP) on the STANDBY database
+ 	2) Determine the SCN of the STANDBY database.
+ 	3) Take an incremental backup off the PRIMARY database
+ 	4) Transfer all backup sets to STANDBY server
+ 	5) Catalog the backups in STANDBY controlfile.
+ 	6) Recover the STANDBY database with the cataloged incremental backup:
+ 	7) In RMAN, connect to the PRIMARY database and create a standby control file backup:
+ 	8) Copy the standby control file backup to the STANDBY system.   If the backup is written to NFS device, this step can be skipped.
+ 	9) Capture datafile information in STANDBY database.
+ 	10) From RMAN, connect to STANDBY database and restore the standby control file:
+ 	11) Mount the standby:
+ 	12) Catalog datafiles in STANDBY if location/name of datafiles is different
+ 	13) Configure the STANDBY database to use flashback (optional)
+ 	14) On STANDBY database, clear all standby redo log groups:
+ 	15) On the STANDBY database, start the MRP
+References
+APPLIES TO:
+Oracle Database - Enterprise Edition - Version 10.2.0.1 to 12.1.0.2 [Release 10.2 to 12.1]
+Information in this document applies to any platform.
+Checked for relevance on 03-Dec-2019
+
+
+GOAL
+The steps in this section can used to resolve problems of missing or corrupted archive log file, an unresolveable archive gap, or the need to roll the standby forward in time without applying a large number of archivelog files.  
+
+SOLUTION
+ 
+
+NOTE: In the images and/or the document content below, the user information and environment data used represents fictitious data from the Oracle sample schema(s), Public Documentation
+delivered with an Oracle database product or other training material. Any similarity to actual environments, actual persons, living or dead, is purely coincidental and not intended in any manner.
+For the purposes of this document, the following fictitious environment is used as an example to describe the procedure:
+
+Primary Database:
+DB_NAME: PRIM (net service name 'PRIM')
+
+Standby Database:
+DB_UNIQUE_NAME: STBY (net service name 'STBY')
+
+Disk Group Name:
++DATA
+
+*********
+
+BEFORE YOU BEGIN:
+If you are running 12c or higher, consider using the new 'recover from service' RMAN command.  See:
+Rolling Forward a Physical Standby Using Recover From Service Command in 12c (Note:1987763.1)
+
+To resolve only NOLOGGING operations, see:
+Rolling a Standby Forward using an RMAN Incremental Backup To Fix The Nologging Changes (Note:958181.1)
+
+If datafiles have been added to the primary database, see:
+Steps to perform for Rolling forward a standby database using RMAN incremental backup when datafile is added to primary (Note:1531031.1)
+1) Stop the managed recovery process (MRP) on the STANDBY database
+SQL> ALTER DATABASE RECOVER MANAGED STANDBY DATABASE CANCEL;
+ 
+
+NOTE:  If using broker, you will need to stop MRP through DGMGRL. I.e.:
+DGMGRL> edit database '<Standby db_unique_name>' set STATE='APPLY-OFF' ;
+
+For the remaining steps, the standby database must be in a MOUNT state.  If the standby database is running RAC, ensure only one instance is mounted.
+2) Determine the SCN of the STANDBY database.
+On the standby database, find the SCN which will be used for the incremental backup taken off the primary database:
+
+You need to use the LOWER of the two SCNs returned by the following queries:
+
+
+SQL> SELECT to_char(CURRENT_SCN) FROM V$DATABASE;
+
+CURRENT_SCN
+--------------
+3164433
+
+
+SQL> select min(checkpoint_change#) from v$datafile_header
+where file# not in (select file# from v$datafile where enabled = 'READ ONLY');
+
+MIN(F.FHSCN)
+----------------
+3162298
+
+You need to use the 'lowest SCN' from the above queries.  In the above example, that SCN would be 3162298.  Therefore, from the above example, the backup would be taken from SCN 3162298.
+
+3) Take an incremental backup off the PRIMARY database
+In RMAN, connect to the primary database and create an incremental backup from the SCN derived in the previous step:
+
+RMAN> BACKUP INCREMENTAL FROM SCN 3162298 DATABASE FORMAT '/tmp/ForStandby_%U' tag 'FORSTANDBY';
+4) Transfer all backup sets to STANDBY server
+All backups created by step #3 must be transferred from the primary to the standby server.  If the backup is written to NFS device, this step can be skipped.  
+
+$ scp /tmp/ForStandby_* standby:/tmp
+5) Catalog the backups in STANDBY controlfile.
+In order for the standby database to know about the backups, catalog the backup pieces on the STANDBY database.  
+
+RMAN> CATALOG START WITH '/tmp/ForStandby';
+
+using target database control file instead of recovery catalog
+searching for all files that match the pattern /tmp/ForStandby
+
+List of Files Unknown to the Database
+=====================================
+File Name: /tmp/ForStandby_2lkglss4_1_1
+File Name: /tmp/ForStandby_2mkglst8_1_1
+
+Do you really want to catalog the above files (enter YES or NO)? YES
+cataloging files...
+cataloging done
+
+List of Cataloged Files
+=======================
+File Name: /tmp/ForStandby_2lkglss4_1_1
+File Name: /tmp/ForStandby_2mkglst8_1_1
+6) Recover the STANDBY database with the cataloged incremental backup:
+RMAN> RECOVER DATABASE NOREDO;
+
+starting recover at 03-JUN-09
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: sid=28 devtype=DISK
+channel ORA_DISK_1: starting incremental datafile backupset restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+destination for restore of datafile 00001: +DATA/STBY/datafile/system.297.688213333
+destination for restore of datafile 00002: +DATA/STBY/datafile/undotbs1.268.688213335
+destination for restore of datafile 00003: +DATA/STBY/datafile/sysaux.267.688213333
+channel ORA_DISK_1: reading from backup piece /tmp/ForStandby_2lkglss4_1_1
+channel ORA_DISK_1: restored backup piece 1
+piece handle=/tmp/ForStandby_2lkglss4_1_1 tag=FORSTANDBY
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:02
+Finished recover at 03-JUN-09
+7) In RMAN, connect to the PRIMARY database and create a standby control file backup:
+RMAN> BACKUP CURRENT CONTROLFILE FOR STANDBY FORMAT '/tmp/ForStandbyCTRL.bck';
+8) Copy the standby control file backup to the STANDBY system.   If the backup is written to NFS device, this step can be skipped.
+$ scp /tmp/ForStandbyCTRL.bck standby:/tmp
+9) Capture datafile information in STANDBY database.
+The standby controlfile will need to be refreshed from the backup taken at step #7.  Since the datafile names are likely different than primary, save the names of your standby datafile names for reference after restoring the controlfile from the primary backup.  Run below query in the standby database and save the results for further use.
+
+spool standby_datafile_names.txt
+set pagesize 1000;
+set lines 200
+col name format a60
+select file#, name from v$datafile order by file# ;
+spool off
+10) From RMAN, connect to STANDBY database and restore the standby control file:
+RMAN> SHUTDOWN IMMEDIATE ;
+RMAN> STARTUP NOMOUNT;
+RMAN> RESTORE STANDBY CONTROLFILE FROM '/tmp/ForStandbyCTRL.bck';
+
+Starting restore at 03-JUN-09
+using target database control file instead of recovery catalog
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: sid=36 devtype=DISK
+
+channel ORA_DISK_1: restoring control file
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:07
+output filename=+DATA/STBY/controlfile/current.257.688583989
+Finished restore at 03-JUN-09
+11) Mount the standby:
+RMAN> ALTER DATABASE MOUNT;
+12) Catalog datafiles in STANDBY if location/name of datafiles is different
+Note:  We recommend checking the incarnation for primary and standby before completing this step.
+
+example:  RMAN> list incarnation; 
+
+Since the controlfile is restored from PRIMARY the datafile location names in this restored STANDBY controlfile will be same as those of the PRIMARY database.  If the directory structure is different between the standby and primary databases or if you are using Oracle managed file names OMF, catalog the STANDBY datafiles with RMAN to execute the rename operation.  If the primary and standby have identical structure and datafile names, this step can be skipped.
+
+Perform the below step  in STANDBY for each diskgroup (or directory) where the standby datafiles reside.   
+
+RMAN> CATALOG START WITH '+DATA/STBY/datafile/';
+
+List of Files Unknown to the Database
+=====================================
+File Name: +DATA/STBY/DATAFILE/SYSTEM.309.685535773
+File Name: +DATA/STBY/DATAFILE/SYSAUX.301.685535773
+File Name: +DATA/STBY/DATAFILE/UNDOTBS1.302.685535775
+File Name: +DATA/STBY/DATAFILE/SYSTEM.297.688213333
+File Name: +DATA/STBY/DATAFILE/SYSAUX.267.688213333
+File Name: +DATA/STBY/DATAFILE/UNDOTBS1.268.688213335
+
+Do you really want to catalog the above files (enter YES or NO)? YES
+cataloging files...
+cataloging done
+
+List of Cataloged Files
+=======================
+File Name: +DATA/STBY/DATAFILE/SYSTEM.297.688213333
+File Name: +DATA/STBY/DATAFILE/SYSAUX.267.688213333
+File Name: +DATA/STBY/DATAFILE/UNDOTBS1.268.688213335
+If any datafiles have been added to primary AFTER the backup SCN (in our example, scn 3162298) those datafiles will not be created on the standby server automatically regardless of standby_file_management
+parameter setting.  The added datafiles will have to be restored to the standby server.  See the following for more details:
+Note:1531031.1 Steps to perform for Rolling forward a standby database using RMAN incremental backup when datafile is added to primary)
+
+The restored datafiles will have to be cataloged as shown above before proceeding with the RMAN switch command.     
+
+To determine if any files have been added to Primary since the standby current scn:
+
+SQL>SELECT FILE#, NAME FROM V$DATAFILE WHERE CREATION_CHANGE# > 3162298
+If the above query returns with 0 zero rows, no new datafiles have been added and you can switch the cataloged datafiles.   This 'switch' will update the controlfile with the correct location and name of the datafiles in 
+the standby controlfile.
+
+RMAN> SWITCH DATABASE TO COPY;
+
+datafile 1 switched to datafile copy "+DATA/STBY/datafile/system.297.688213333"
+datafile 2 switched to datafile copy "+DATA/STBY/datafile/undotbs1.268.688213335"
+datafile 3 switched to datafile copy "+DATA/STBY/datafile/sysaux.267.688213333"
+Note:
+
+a) If the 'switch database to copy' command fails with the "RMAN-06571: datafile .. does not have recoverable copy" error.   This is an indication that either you have not cataloged all your standby datafiles OR some of your standby datafile's location/name is the same as the primary.  
+
+If the latter, you will have to switch each individual datafile whose location/name are different than that of the primary.  I.e: 
+
+RMAN>  switch datafile <number> to copy;
+
+For example:
+RMAN>  switch datafile 5 to copy; 
+b) At this point, you can compare the query output from step 9 for any discrepancy (other than newly added datafiles) to ensure we have all the datafiles added in standby.
+
+c) Run the queries from step 2 again to confirm that the incremental apply has rolled the datafiles forward.   The SCN should now be bigger than the initial values.
+
+13) Configure the STANDBY database to use flashback (optional)
+If the STANDBY database needs to be configured for FLASHBACK run the following commands:
+
+SQL> ALTER DATABASE FLASHBACK OFF; 
+SQL> ALTER DATABASE FLASHBACK ON;
+ 
+
+NOTE:  This command may return the following:
+   ORA-38788 More standby database recovery is needed
+Depending on situation, this is expected.  Proceed with the remaining steps.
+14) On STANDBY database, clear all standby redo log groups:
+SQL> select GROUP# from v$logfile where TYPE='STANDBY' group by GROUP#;
+SQL> ALTER DATABASE CLEAR LOGFILE GROUP 1;
+SQL> ALTER DATABASE CLEAR LOGFILE GROUP 2;
+SQL> ALTER DATABASE CLEAR LOGFILE GROUP 3;
+....
+15) On the STANDBY database, start the MRP
+SQL> ALTER DATABASE RECOVER MANAGED STANDBY DATABASE DISCONNECT;
+  
+
+NOTE:  If using broker, you will need to start MRP through DGMGRL. I.e.:
+DGMGRL> edit database '<Standby db_unique_name>' set STATE='APPLY-ON' ;

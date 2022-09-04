@@ -1,0 +1,63 @@
+
+sudo /net/js/Nordea/scripts/ora_mount.sh 
+select 'drop '||object_type||' '||owner||'.'||object_name||';' cmd from dba_objects where object_type in ('TRIGGER') and owner='LOANIQ'; 
+
+select 'drop '||object_type||' '||owner||'.'||object_name||' cascade constraints;' cmd from dba_objects where object_type in ('TABLE') and owner='LOANIQ';  
+
+select 'drop '||object_type||' '||owner||'.'||object_name||';' cmd from dba_objects where owner='LOANIQ' and object_type in ('VIEW','FUNCTION','PROCEDURE','PACKAGE','SEQUENCE','TYPE'); 
+
+
+select object_type,count(*) from dba_objects where owner='COSMOS_READ' group by object_type;
+
+SELECT OWNER_NAME,JOB_NAME,OPERATION,JOB_MODE,STATE from DBA_DATAPUMP_JOBS where state='EXECUTING'
+
+srvctl status instance  -d f0182t1h -i f0182t1h4
+
+select sid,serial#,status from gv$session where ins_id=4 and username='LOANIQ';
+
+srvctl stop instance -d f0182t1h -i f0182t1h4 -force
+
+srvctl stop database -d 
+
+SELECT 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;' FROM gv$session where inst_id=4 and status=INACTIVE;
+
+SET LINESIZE 150
+
+COLUMN owner_name FORMAT A20
+COLUMN job_name FORMAT A30
+COLUMN operation FORMAT A10
+COLUMN job_mode FORMAT A10
+COLUMN state FORMAT A12
+
+SELECT owner_name,
+       job_name,
+       TRIM(operation) AS operation,
+       TRIM(job_mode) AS job_mode,
+       state,
+       degree,
+       attached_sessions,
+       datapump_sessions
+FROM   dba_datapump_jobs
+ORDER BY 1, 2;
+
+ Service: s_arc830_arc830_20042010_t is running on instance(s) f0182t1h1
+               Service: s_fanva_fanv_20040614_s is running on instance(s) f0182t1h1
+               Service: s_gipg_gipg_20051313_t is running on instance(s) f0182t1h2
+               Service: s_gpeas3_gxct_20060215_t is running on instance(s) f0182t1h1
+               Service: s_gpeba3_gxct_20060215_t is running on instance(s) f0182t1h1
+               Service: s_gped3_gxct_20060214_t is running on instance(s) f0182t1h2
+               Service: s_loaniqu_liq_20033011_s is running on instance(s) f0182t1h4
+               Service: s_obacb_obac_20051909_t is running on instance(s) f0182t1h2
+               Service: s_pagnc_pagn_20060212_t is running on instance(s) f0182t1h2
+               Service: s_sailpat03_k8_20052610_t is running on instance(s) f0182t1h2
+
+[10/18/2021 4:18 AM] Verma, Abhishek
+sudo /net/js/Nordea/scripts/ora_mount.sh select 'drop '||object_type||' '||owner||'.'||object_name||';' cmd from dba_objects where object_type in ('TRIGGER') and owner='TRIDATA01'; / 
+
+select 'drop '||object_type||' '||owner||'.'||object_name||' cascade constraints;' cmd from dba_objects where object_type in ('TABLE') and owner='TRIDATA'; / select 'drop '||object_type||' '||owner||'.'||object_name||';' cmd from dba_objects where owner='TRIDATA' and object_type in ('VIEW','FUNCTION','PROCEDURE','PACKAGE','SEQUENCE','TYPE'); /
+
+[10/18/2021 4:19 AM] Verma, Abhishek
+select object_type,count(*) from dba_objects where owner='TRIDATA' group by object_type;
+
+
+

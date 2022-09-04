@@ -1,0 +1,46 @@
+SELECT DBMS_METADATA.GET_DDL('DB_LINK','TEST','ARBOR') FROM DUAL;
+
+
+
+
+
+SELECT DBMS_METADATA.GET_granted_DDL('TABLESPACE_QUOTA','ARBOR') FROM dual;
+
+
+
+
+
+SELECT DBMS_METADATA.GET_DDL('TABLESPACE', tablespace_name) FROM DBA_tablespaces;
+
+
+
+
+
+SELECT substr(DBMS_METADATA.GET_DDL('USER', username),1,255) FROM DBA_users;
+
+
+
+
+
+SELECT dbms_metadata.get_ddl('ROLE', 'DBA') FROM DUAL
+
+
+
+
+
+SELECT dbms_metadata.get_granted_ddl('ROLE_GRANT','DBA') from dual;
+
+
+
+
+
+---------------------------------------------
+select dbms_metadata.get_ddl( 'USER', 'ARBOR' ) from dual
+UNION ALL
+select dbms_metadata.get_granted_ddl( 'SYSTEM_GRANT', 'ARBOR' ) from dual
+UNION ALL
+select dbms_metadata.get_granted_ddl( 'OBJECT_GRANT', 'ARBOR' ) from dual
+UNION ALL
+select dbms_metadata.get_granted_ddl( 'INDEX', 'AIDX_QUOTES_SEGMENT_50' ) from dual
+union all
+select dbms_metadata.get_granted_ddl( 'TABLESPACE_QUOTA', 'ARBOR' ) from dual

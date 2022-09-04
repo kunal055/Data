@@ -1,0 +1,100 @@
+[1:44 AM] Rishi, Jeevan
+service issue:- alter session set container=ORCLPDB; column con_id format 99
+
+ column pdb format a15
+
+ column network_name format a30
+
+select con_id, pdb, network_name from cdb_services where pdb is not null and con_id > 2 order by pdb; 
+ALTER SYSTEM SET LOCAL_LISTENER='(ADDRESS=(PROTOCOl=TCP)(HOST=10.96.31.148)(PORT=1521))' SCOPE=BOTH sid='s0093t1h3';
+
+exec dbms_service.create_service('s0778d_ro','s0778d_ro'); 
+
+
+exec dbms_service.create_service ( service_name => 'tip7at' , network_name => 'tip7at');
+
+exec dbms_service.start_service('tip7at'); 
+
+
+begin
+dbms_service.start_service('tip7at');
+end;
+/
+
+alter system set remote_listener='db-s004hhp-scan:1521';
+exec dbms_service.start_service('tip7at', DBMS_SERVICE.ALL_INSTANCES);
+ 
+exec dbms_service.start_service('ERPGEN', DBMS_SERVICE.ALL_INSTANCES);
+
+exec dbms_service.start_service('tip7at', DBMS_SERVICE.ALL_INSTANCES);
+
+alter pluggable database P_TIP7A_OTC_22072804_T save state;
+
+alter pluggable database P_CBPE_CBP_21112811_T save state instances=all; 
+select con_id, pdb, network_name from cdb_services where pdb is not null and con_id > 2 order by pdb; 
+
+column name format a30;
+
+column network_name format a30;
+
+select name, network_name from v$active_services; 
+select inst_id, name, network_name from gv$active_services; ===> for remove in case  
+exec dbms_service.stop_service('tip7at', DBMS_SERVICE.ALL_INSTANCES); 
+exec dbms_service.delete_service('tip7at');
+
+exec dbms_service.create_service ( service_name => 'tip7at' , network_name => 'tip7at');
+
+  
+
+ipcrm -a
+ipcs -m   
+
+send extract showtrans duration 2hour                                                                                                           12
+
+
+
+sqlplus sys@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-s004hhd-scan.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=dmsppolp))) as sysdba
+
+
+
+
+
+Dispose Oracle database OCSHNO1D
+
+
+Database is not accessible because services are pointed on second node but db is running on 1st node. This was happened due to issue on cluster. I have set it on correct node 1. Now its working fine.  
+
+sqlplus sys@(DESCRIPTION =(LOAD_BALANCE = OFF) (FAILOVER = ON)(CONNECT_TIMEOUT = 5)(TRANSPORT_CONNECT_TIMEOUT = 3)(RETRY_COUNT = 3 )(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = ora-cced-a.qaoneadr.local)(PORT = 1521))(ADDRESS =(PROTOCOL = TCP)(HOST = ora-cced-b.qaoneadr.local)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = cced)(FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))) as sysdba
+
+
+sqlplus sys@(DESCRIPTION =
+(LOAD_BALANCE = OFF)
+
+ (FAILOVER = ON)
+
+ (CONNECT_TIMEOUT = 5)
+
+ (TRANSPORT_CONNECT_TIMEOUT = 3)
+
+ (RETRY_COUNT = 3 )
+
+ (ADDRESS_LIST =
+
+  (ADDRESS = (PROTOCOL = TCP)(HOST = ora-cormbld-a.qaoneadr.local)(PORT = 1521))
+
+  (ADDRESS = (PROTOCOL = TCP)(HOST = ora-cormbld-b.qaoneadr.local)(PORT = 1521))
+
+ )
+
+ (CONNECT_DATA =
+
+  (SERVICE_NAME = cormbld)
+
+  (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+
+ )
+
+) as sysdba
+
+
+Database was not accessible beacuse local_listener parameter is not set correctly. I have set the remote listener parameter and its working fine now.

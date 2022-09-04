@@ -1,0 +1,99 @@
+
+alter user CRMAS_ODS_AM grant execute any procedure to K059770;
+alter user ARGUSPORTAL grant connect through G02843;
+GRANT EXECUTE ON CRMAS_ODS_AM TO K059770;
+CRMAS_ODS_AM
+CRMAS_ODS_RAW_DATA
+CRMAS_ODS_ETL
+CRMAS_RCM
+CRMAS_UDM_CDS
+CRMAS_UDM_STG
+
+ALFA,ALFAEXTD
+
+ARGUS, ARGUSPORTAL, ARGUSPORTALTUAPP
+
+select username,account_status from dba_users where username=
+​
+CREATE USER "M018431" IDENTIFIED BY Dkfjfbrfvfw7M DEFAULT TABLESPACE "USERS" TEMPORARY TABLESPACE "TEMP" PROFILE "PERSONAL_USER_PROFILE";
+​
+    
+grant RL_USR_ORG_FRC_MRC to M018431;
+
+,RL_SCM_GSIP_BPHADMIN_READ,RL_SCM_GSIP_BPHADMIN_UPD
+grant RL_SCM_DATAACCESSLAYER_READ role to CC30870;
+
+
+select a.username,a.account_status,a.profile,b.password,a.expiry_date from dba_users a, sys.user$ b where username in('ACC') and a.USER_ID = b.USER#
+
+select 'alter user "'||d.username||'" identified by values '''||u.password||''';' from dba_users d, sys.user$ u where d.username = upper('&&username') and u.user# = d.user_id;
+
+
+
+GRANT SELECT ON V$SESSION TO G90869;
+
+grant select any dictionary to G50034;
+grant create session,connect,resource to K332360;
+
+ALTER USER N416960  PASSWORD EXPIRE;
+
+SELECT default_tablespace FROM dba_users WHERE username='CRMSCEN';
+
+select tablespace_name, file_name ,AUTOEXTENSIBLE,MAXBYTES,INCREMENT_BY from dba_data_files where tablespace_name='CRMSCEN_T_256K';
+
+SELECT next_extent, pct_increase FROM dba_segments WHERE segment_name='TEST_VALUE_TRADE' AND segment_type  ='TABLE' AND owner ='CRMSCEN';
+
+SELECT * FROM dba_recyclebin WHERE ts_name='CRMSCEN_T_256K';
+
+ALTER DATABASE DATAFILE '/path_to_datafile/datafilename.dbf' RESIZE 10G;
+
+
+BEGIN
+   FOR R IN (SELECT owner, table_name FROM all_tables WHERE owner='CRMAS_UDM_STG') LOOP
+      EXECUTE IMMEDIATE 'grant truncate on '||R.owner||'.'||R.table_name||' to K332360';
+   END LOOP;
+END;
+/
+
+crmasa3clnt
+CRMASA3CLNT
+Select 'GRANT truncate ON CRMAS_UDM_STG.'||Table_Name||'TO K332360' 
+ From All_Tables Where Owner='CRMAS_UDM_STG'
+
+Select 'GRANT SELECT ON ANASYS.'||Table_Name||' TO G02843;' 
+From All_Tables Where Owner='ANASYS';
+
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'SBT_TAPE';
+
+GRANT ALL PRIVILEGES TO K059770;
+
+set head off
+set pages 0
+set long 9999999
+select dbms_metadata.get_ddl('USER', username) || '/' usercreate
+from dba_users where username='NFETL_BIPLATFORM';
+
+alter user NFETL_BIPLATFORM identified by values
+
+
+
+SELECT * FROM DBA_ROLE_PRIVS where GRANTEE='G04272';
+
+SELECT * FROM USER_SYS_PRIVS where GRANTEE='G04272';
+
+select to_char(maxbytes/1024/1024/1024) from dba_temp_files;
+
+alter tablespace TEMP AUTOEXTEND ON MAXSIZE 1800 G;
+
+select resource_name, limit from dba_profiles where profile='TECHNICAL_USER_PROFILE' resource_name='PASSWORD_REUSE_MAX';
+
+alter profile TECHNICAL_USER_PROFILE limit PASSWORD_REUSE_TIME UNLIMITED;
+
+select profile, resource_name, limit from dba_profiles where profile='TECHNICAL_USER_PROFILE' and RESOURCE_NAME = 'PASSWORD_VERIFY_FUNCTION';
+
+alter profile TECHNICAL_USER_PROFILE limit PASSWORD_VERIFY_FUNCTION null;
+
+
+select profile, resource_name, limit
+   from dba_profiles  
+  where resource_type='PASSWORD' order by 1,2;

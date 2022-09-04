@@ -1,0 +1,47 @@
+Blackout databases in OEM.
+
+Disable standby database in DG-broker.
+
+Stop standby database.
+
+Delete files on standby database via grid/asm.
+
+Start one standby instance in nomount mode.
+
+srvctl start instance -d h0028d1o -i h0028d1o1 -o nomount
+
+Recreate standby from primary:
+
+[oracle@db-s001hh01d ~]$ rman target sys@njos1p1h auxiliary sys@NJOS1P1C
+
+oracle@db-s001hh01d ~]$ rman target sys@njos1p1h auxiliary sys@ (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=dm16db07-vip.qaoneadr.net.)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(UR=A)(service=njos1p1c7)))
+
+
+(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(Host=dm16db07-vip.oneadr.net)(Port=1521))(CONNECT_DATA=(SID=njos1p1c7)))
+
+Recovery Manager: Release 12.2.0.1.0 - Production on Fri Nov 29 11:49:52 2019
+
+Copyright (c) 1982, 2017, Oracle and/or its affiliates.  All rights reserved.
+
+target database Password:
+connected to target database: H0028D (DBID=2868517878)
+auxiliary database Password:
+connected to auxiliary database: H0028D (not mounted)
+
+
+RMAN> run {
+allocate channel t1 type disk;
+allocate channel t2 type disk;
+allocate auxiliary channel t11 type disk;
+allocate auxiliary channel t12 type disk;
+duplicate target database for standby from active database;
+nofilenamecheck;
+}
+
+Enable standby database in DG-broker.
+
+Check standby database is applying.
+
+Open standby database read only.
+
+Done.

@@ -1,0 +1,78 @@
+create table registry$sqlpatch_org_bkp_09Apr as select * from registry$sqlpatch;
+
+
+exec dbms_pdb.exec_as_oracle_script('drop table registry$sqlpatch');
+
+@$ORACLE_HOME/rdbms/admin/catsqlreg.sql
+
+set linesize 150
+col name for a15
+col cause for a15
+col message for a50
+
+select name, cause, type, message, status from pdb_plug_in_violations where type = 'ERROR' and status != 'RESOLVED'  order by name, time;
+
+
+
+grant SELECT on MDSYS.SDO_COORD_REF_SYSTEM to PUBLIC;
+
+
+
+
+====  CDB -PDB issue 
+
+create table registry$sqlpatch_org_bkp_19July as select * from registry$sqlpatch;
+ 
+exec dbms_pdb.exec_as_oracle_script('drop table registry$sqlpatch');
+
+@$ORACLE_HOME/rdbms/admin/catsqlreg.sql
+
+
+Hello,
+
+Run the following scripts in CDB:
+
+connect / as sysdba
+
+@?/ord/admin/ordinst.sql SYSAUX SYSAUX
+@?/ord/im/admin/catim.sql
+execute sys.validate_ordim;
+
+The violations should be fixed and the DB can be open.
+
+Thanks
+
+
+alter pluggable database P_GPESR_GOBI_19010214_T close instances=all;
+
+
+alter pluggable database P_GPESR_GOBI_19010214_T open;
+
+
+cd $ORACLE_HOME/OPatch
+datapatch -verbose -apply 31668882/23790068 -force -pdbs PDB$SEED
+
+set linesize 150
+col name for a15
+col cause for a15
+col message for a50
+
+ 
+
+select name, cause, type, message, status from pdb_plug_in_violations where type = 'ERROR' and status != 'RESOLVED'  order by name, time;
+
+create table registry$sqlpatch_org_bkp__APR as select * from registry$sqlpatch;
+
+ALTER TABLESPACE TEMP ADD TEMPFILE '+S011HHP_DATA' SIZE 10G AUTOEXTEND ON;
+
+
+ 
+
+
+exec dbms_pdb.exec_as_oracle_script('drop table registry$sqlpatch');
+
+ 
+
+@$ORACLE_HOME/rdbms/admin/catsqlreg.sql
+
+

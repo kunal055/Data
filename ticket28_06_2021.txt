@@ -1,0 +1,308 @@
+ 
+
+/me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=b5380p ENV_FILE=/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg TARGET_DATABASE=b0450d1 && /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=b0450d ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg TARGET_DATABASE=b0450d1 &
+
+/me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=h0074d ENV_FILE=/me01/oracle/dbadmin/backup/sop_oe_test.cfg TARGET_DATABASE=h0074d1 && /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=h0074d ENV_FILE=/me01/oracle/dbadmin/backup/sop_oe_test.cfg TARGET_DATABASE=h0074d1 &
+
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg
+/me01/oracle/dbadmin/backup/exa19_oe_test.cfg
+
+/me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=NO CAT_USER=h0438d ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg TARGET_DATABASE=h0438d1 && /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=NO CAT_USER=h0438d ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg TARGET_DATABASE=h0438d1 &
+
+
+/me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=cbpcd ENV_FILE=/me01/oracle/dbadmin/backup/exa_hh_test.cfg TARGET_DATABASE=cbpcd1 && /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=cbpcd ENV_FILE=/me01/oracle/dbadmin/backup/exa_hh_test.cfg TARGET_DATABASE=cbpcd1 &
+s0005t1h
+s0061t1h
+h0048d1h
+
+SELECT DEGREE FROM DBA_TABLES WHERE TABLE_NAME = '<table_name>';
+
+
+
+_b5195p1
+ rman target '"/@rman_s5323p1h as sysbackup"' catalog [s5323p]@rmanproxy
+
+
+
+rman target "' /@rman_h5063p1o as sysbackup '" catalog [h5063p]@rmanproxy
+sqlplus [F4055D]@rmanproxy
+
+rman target  "'/@rman_bspp2p'"   catalog bspppx/cat_bsppbp@rmanp
+
+rman target '"/@rman_bspp2p as sysbackup"' catalog [bspp2p]@rmanproxy
+rman target '"/@rman_sunp1c as sysbackup"' catalog [sunp]@rmanproxy
+
+rman target "'/@rman_njos2p1h '" connect  catalog NJOS2P/cat_njos2p@rmanp   EXA-11g 
+
+rman target  "'/@rman_sunp1c '"   catalog SUNP/cat_sunp@rmanp EXA-11g
+
+
+
+run
+{
+restore archivelog from logseq=673528 until logseq=673541;
+}
+
+run {
+allocate channel c1 type 'sbt_tape';
+restore archivelog from logseq=673528 until logseq=673541;
+release channel c1;
+}
+
+
+
+
+
+                   If you want to restore particular sequence of archivelogs from RMAN tape backup, then follow below steps.
+
+ 
+
+connect target sys/******@CRM_DB
+
+connect catalog RMAN_tst/*****@catdb
+
+connect target /
+
+connect catalog bspppx/cat_bsppp@rmanp
+
+run
+{
+allocate channel t1 type SBT_TAPE parms 'ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_local.opt)'connect sys/Pony2last4ever@bspp2p;
+restore archivelog from sequence 673528 until sequence 673541;
+release channel t1;
+}
+
+
+
+nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=bspppx ORACLE_SERVICE="bspp1p" ORACLE_SID=bsppp &
+
+nohup /me01/oracle/dbadmin/backup/db_backup.sh ORACLE_SERVICE=bspp1p  BACKUP_ARCHIVE_ONLY=YES &
+
+BACKUP_DB_ONLY=YES
+
+/me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=h5030p ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_prod.cfg TARGET_DATABASE=h5030p1 && /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=h5030p ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_prod.cfg TARGET_DATABASE=h5030p1 &
+/me01/oracle/dbadmin/backup/db_backup.sh ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_prod.cfg TARGET_DATABASE=b5195p1 CAT_USER=b5195p BACKUP_ARCHIVE_ONLY=YES
+ &
+464390
+468392
+466000
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'DISK';
+ nohup /me01/oracle/dbadmin/backup/db_backup_3.sh BACKUP_ARCHIVE_ONLY='YES' ORACLE_SERVICE="twt" & ORACLE_SID=tw1t &
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'DISK'
+
+ nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY="YES" ORACLE_SERVICE="oemp" &
+ORACLE_SERVICE=wstoxt
+
+ nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=NO ORACLE_SERVICE=" ORACLE_SID=oema1p &
+
+
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg
+
+
+Perfrom manual backup,Please check with UC4 team 19c Database backup failed due to wrong environmental file.
+
+
+find /u01/app/oracle/admin/orcl/adump -type f -mtime +7 -name '*.aud' -exec rm -f {} \;
+
+/u01/app/oracle/admin/alfapkt/adump
+
+/me01/oracle/dbadmin/audit
+	db-s003hh02d.qaoneadr.local		
+	Target Information
+
+INC000002080538 solved 
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'SBT_TAPE';
+
+
+    run  /m01/oracle/dbadmin/standby/db_standby_monitor.sh
+CRQ001000122803
+Prod: Central backup scheduler server:   is-exasch1p
+
+Non-Porc Central backup scheduler server :   is-exasch1d
+
+ is-vnc2p.oneadr.net
+
+PexA2last4ever
+NexA2last4ever
+
+
+
+/me01/oracle/dbadmin/backup/db_backup.sh ENV_FILE=/me01/oracle/dbadmin/backup/sop_oe_prod.cfg TARGET_DATABASE=b5195p1 CAT_USER=b5195p BACKUP_ARCHIVE_ONLY=YES
+/me01/oracle/dbadmin/backup/db_backup.sh ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_prod.cfg TARGET_DATABASE=b5195p1 CAT_USER=b5195p BACKUP_ARCHIVE_ONLY=YES
+
+
+Please check with UC4 team 19c database backup failed due to wrong envirmental file
+(/me01/oracle/dbadmin/backup/sop_oe_test.cfg) 
+
+Yvonne E Johansson
+g34733
+
+db-bspp2p and db-bspp1p
+
+ ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg
+
+alter session set container=pdbname;
+
+select name, max_size/1024/1024/1024 MAX_GB, TOTAL_SIZE/1024/1024/1024 Current_GB
+from v$pdbs
+order by name;
+
+
+nohup expdp parfile=EXPCRQ001000136024.par &
+nohup expdp parfile=expCRQ0010001354451.par &
+
+userid=system/Pack2last4ever@"(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=db-s005hh01p.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=s_nior_nior_19041609_p)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
+directory=EXP_DIR
+dumpfile=exp_IMDB_ARDB_2CRQ001000135445_%u.dmp
+logfile=exp_IMDB_ARDB_2CRQ001000135445.log
+schemas=ARDB,IMDB
+flashback_time=systimestamp
+compression=all
+parallel=4
+reuse_dumpfiles=Y
+cluster=no
+
+
+
+ALTER DATABASE DATAFILE '+S006HALTER DATABASE DATAFILE '+S006HHP_DATA/H5128P1H/9CA64937AD616FE9E053934D680A6307/DATAFILE/crmdm_mod_dev_t.1838.1063031147' AUTOEXTEND ON NEXT 1024M MAXSIZE 4194304M
+
+
+
+set line 1000
+set pages 5000
+col tablespace_name for a30
+col file_name for a80
+col free_space for 9999999
+compute sum of total_space on report
+compute sum of free_space on report
+compute sum of MAX_SPACE on report
+break on tablespace_name on report nodup
+
+select c.tablespace_name,a.autoextensible,a.file_name,a.total_space,b.free_space, round(b.free_space/a.total_space *100,2) "Free%",a.max_space from (select file_id,file_name,sum(bytes)/1024/1024 total_space,sum(MAXBYTES)/1024/1024/1024 max_space,autoextensible from dba_data_files group by file_id,file_name,autoextensible) a,(select file_id,nvl(sum(bytes)/1024/1024,0) free_space from dba_free_space group by file_id) b, (select tablespace_name,file_id from dba_data_files) c where a.file_id=b.file_id(+) and a.file_id=c.file_id order by tablespace_name;
+
+
+
+
+
+
+
+
+------------------------------------ ----------- ------------------------------
+local_listener                       string      (ADDRESS=(PROTOCOl=TCP)(HOST=d
+                                                 b-s001hh01d.qaoneadr.local)(PO
+                                                 RT=1521))
+
+alter system set local_listener='(ADDRESS=(PROTOCOl=TCP)(HOST=db-s001hh01d-vip.qaoneadr.local)(PORT=1521))' scope=both sid='h0022d1h1';
+
+
+
+set lines 220
+set pages 1000
+col cf for 9,999
+col df for 9,999
+col elapsed_seconds heading "ELAPSED|SECONDS"
+col i0 for 9,999
+col i1 for 9,999
+col l for 9,999
+col output_mbytes for 9,999,999 heading "OUTPUT|MBYTES"
+col session_recid for 999999 heading "SESSION|RECID"
+col session_stamp for 99999999999 heading "SESSION|STAMP"
+col status for a10 trunc
+col time_taken_display for a10 heading "TIME|TAKEN"
+col output_instance for 9999 heading "OUT|INST"
+select
+to_char(j.start_time, 'yyyy-mm-dd hh24:mi:ss') start_time,
+to_char(j.end_time, 'yyyy-mm-dd hh24:mi:ss') end_time,
+(j.output_bytes/1024/1024) output_mbytes, j.status, j.input_type,
+decode(to_char(j.start_time, 'd'), 1, 'Sunday', 2, 'Monday',
+3, 'Tuesday', 4, 'Wednesday',
+5, 'Thursday', 6, 'Friday',
+7, 'Saturday') dow,
+j.elapsed_seconds, j.time_taken_display,
+x.cf, x.df, x.i0, x.i1, x.l,
+ro.inst_id output_instance
+from v$RMAN_BACKUP_JOB_DETAILS j
+left outer join (select
+d.session_recid, d.session_stamp,
+sum(case when d.controlfile_included = 'YES' then d.pieces else 0 end) CF,
+sum(case when d.controlfile_included = 'NO'
+and d.backup_type||d.incremental_level = 'D' then d.pieces else 0 end) DF,
+sum(case when d.backup_type||d.incremental_level = 'D0' then d.pieces else 0 end) I0,
+sum(case when d.backup_type||d.incremental_level = 'I1' then d.pieces else 0 end) I1,
+sum(case when d.backup_type = 'L' then d.pieces else 0 end) L
+from
+v$BACKUP_SET_DETAILS d
+join v$BACKUP_SET s on s.set_stamp = d.set_stamp and s.set_count = d.set_count
+where s.input_file_scan_only = 'NO'
+group by d.session_recid, d.session_stamp) x
+on x.session_recid = j.session_recid and x.session_stamp = j.session_stamp
+left outer join (select o.session_recid, o.session_stamp, min(inst_id) inst_id
+from Gv$RMAN_OUTPUT o
+group by o.session_recid, o.session_stamp)
+ro on ro.session_recid = j.session_recid and ro.session_stamp = j.session_stamp
+where j.start_time > trunc(sysdate)-&NUMBER_OF_DAYS
+order by j.start_time;
+
+
+col dbsize_mbytes      for 99,999,990.00 justify right head "DBSIZE_MB"
+col input_mbytes       for 99,999,990.00 justify right head "READ_MB"
+col output_mbytes      for 99,999,990.00 justify right head "WRITTEN_MB"
+col output_device_type for a10           justify left head "DEVICE"
+col complete           for 990.00        justify right head "COMPLETE %"
+col compression        for 990.00        justify right head "COMPRESS|% ORIG"
+col est_complete       for a20           head "ESTIMATED COMPLETION"
+col recid              for 9999999       head "ID"
+
+select recid
+     , output_device_type
+     , dbsize_mbytes
+     , input_bytes/1024/1024 input_mbytes
+     , output_bytes/1024/1024 output_mbytes
+     , (output_bytes/input_bytes*100) compression
+     , (mbytes_processed/dbsize_mbytes*100) complete
+     , to_char(start_time + (sysdate-start_time)/(mbytes_processed/dbsize_mbytes),'DD-MON-YYYY HH24:MI:SS') est_complete
+  from v$rman_status rs
+     , (select sum(bytes)/1024/1024 dbsize_mbytes from v$datafile)
+where status='RUNNING'
+   and output_device_type is not null
+/
+
+
+col STATUS format a9
+col hrs format 999.99
+ select SESSION_KEY, INPUT_TYPE, STATUS,
+to_char(START_TIME,'mm/dd/yy hh24:mi') start_time,
+to_char(END_TIME,'mm/dd/yy hh24:mi') end_time,
+elapsed_seconds/3600 hrs from V$RMAN_BACKUP_JOB_DETAILS  where INPUT_TYPE='DB INCR'
+order by session_key;
+
+
+
+
+
+
+
+
+
+[oracle@is-exasch1p /]$ cd /me01/
+drift/  oracle/
+[oracle@is-exasch1p /]$ cd /me01
+[oracle@is-exasch1p me01]$ ls
+drift  oracle
+[oracle@is-exasch1p me01]$ cd drift/scripts/
+-bash: cd: drift/scripts/: Permission denied
+[oracle@is-exasch1p me01]$ ls
+drift  oracle
+[oracle@is-exasch1p me01]$ cd drift/
+[oracle@is-exasch1p drift]$ ls
+backup  log  scripts
+[oracle@is-exasch1p drift]$ cd log
+-bash: cd: log: No such file or directory
+[oracle@is-exasch1p drift]$ ls -ltrh
+total 0
+drwx------. 2 root root 64 Mar  6  2017 scripts
+lrwxrwxrwx  1 root root 18 Oct 23  2017 log -> /oracle_shared/log
+lrwxrwxrwx  1 root root 21 Oct 23  2017 backup -> /oracle_shared/backup
+[oracle@is-exasch1p drift]$ hostname
+is-exasch1p.oneadr.net
+[oracle@is-exasch1p drift]$

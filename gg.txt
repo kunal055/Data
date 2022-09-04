@@ -1,0 +1,19 @@
+run
+{
+allocate channel t1 type SBT_TAPE parms 'ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_cb.opt)';
+restore archivelog from sequence 517524 until sequence 517526;
+release channel t1;
+}
+
+find /u01/app/grid/diag/tnslsnr/db-s002hh03d/listener_scan2/alert/*.xml  -exec -mtime 10 rm -rf {} \;
+
+find /ora_arch_twmp/*.arc -type f -exec -mtime +9 rm -rf {} \;
+
+delete nopromt archivelog until time 'sysdate -9';
+
+delete nopromt archivelog until time 'SYSDATE-7';
+
+rm -rf twmp_0729449560_0001_0001053592.arc twmp_0729449560_0001_0001053593.arc twmp_0729449560_0001_0001053594.arc twmp_0729449560_0001_0001053595.arc twmp_0729449560_0001_0001053596.arc
+
+
+

@@ -1,0 +1,92 @@
+tfa and jib, property graph need to remove
+emagent 
+
+apart from software, emagent ,oracle.ahf
+
+
+Cluster -008
+
+/opt/oracle.ahf/common/jlib/log4j-core-2.15.0.jar
+/u01/app/oracle/product/19.10.0.0/db210119a/suptools/tfa/release/tfa_home/jlib/log4j-core-2.9.1.jar#
+
+tar -cvf log4j_Sec_Patch_Issue.tar log4j-core-2* log4j-api-2*;
+chmod 700 log4j_Sec_Patch_Issue.tar;
+rm -vf log4j-core-2*.jar log4j-api-2*.jar;
+
+db-s008oe01d-Done
+
+/u01/app/oracle/product/12.2.0.1/db200414a/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020c/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db210420z/md/jlib/log4j-core-2.9.1.jar
+
+
+db-s008oe02d.qaoneadr.local-done
+
+/u01/app/oracle/product/12.2.0.1/db200414a/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020c/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db210420z/md/jlib/log4j-core-2.9.1.jar#
+
+db-s008oe03d.qaoneadr.local-done
+
+/u01/app/oracle/product/12.2.0.1/db200414a/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020c/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db210420z/md/jlib/log4j-core-2.9.1.jar#
+
+
+db-s008oe04d-done
+
+/u01/app/oracle/product/12.2.0.1/db200414a/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020c/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db210420z/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/19.10.0.0/db210119a/suptools/tfa/release/tfa_home/jlib/log4j-core-2.9.1.jar
+/u01/lost+found/201613211/md/jlib/log4j-core-2.9.1.jar
+/u01/lost+found/348183455/release/tfa_home/jlib/log4j-core-2.9.1.jar
+/u01/lost+found/349974606/log4j-core-2.9.1.jar
+/u01/lost+found/607879619/md/jlib/log4j-core-2.9.1.jar
+/u01/lost+found/68133391/jlib/log4j-core-2.9.1.jar#
+tar -cvf log4j_Sec_Patch_Issue.tar log4j-core-2* log4j-api-2*;
+chmod 700 log4j_Sec_Patch_Issue.tar;
+rm -vf log4j-core-2*.jar log4j-api-2*.jar;
+
+
+db-s009hh03d.qaoneadr.local-done
+
+/u01/app/oracle/product/19.9.0.0/db201020d/suptools/tfa/release/tfa_home/jlib/log4j-core-2.9.1.jar#
+
+db-s009oe01d-done
+
+/u01/app/oracle/product/19.10.0.0/db210119a/suptools/tfa/release/tfa_home/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/19.9.0.0/db201020d/suptools/tfa/release/tfa_home/jlib/log4j-core-2.9.1.jar#
+
+db-s009oe02d-Done
+
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar#
+
+db-s009oe03d- done
+
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar#
+
+db-s009oe04d.qaoneadr.local-done
+
+/u01/app/oracle/product/12.2.0.1/db201020b/md/jlib/log4j-core-2.9.1.jar
+/u01/app/oracle/product/12.2.0.1/db201020e/md/jlib/log4j-core-2.9.1.jar#
+
+db-s010hh01p.oneadr.net
+
+/u01/software/30463609/30501910/30557433/files/md/property_graph/lib/log4j-core-2.11.0.jar#
+
+db-s010oe01p
+
+/u01/software/30463609/30501910/30557433/files/md/property_graph/lib/log4j-core-2.11.0.jar#
+
+

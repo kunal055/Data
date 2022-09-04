@@ -1,0 +1,16 @@
+Last modified table-
+
+set linesize 500;
+select TABLE_OWNER, TABLE_NAME, INSERTS, UPDATES, DELETES, 
+to_char(TIMESTAMP,'YYYY-MON-DD HH24:MI:SS')
+from all_tab_modifications
+where table_owner<>'SYS' and
+EXTRACT(YEAR FROM TO_DATE(TIMESTAMP, 'DD-MON-RR')) > 2010
+order by 6;
+
+Table_Size-
+
+select segment_name,segment_type, sum(bytes/1024/1024/1024) GB
+ from dba_segments
+ where segment_name='&Your_Table_Name' 
+group by segment_name,segment_type; 

@@ -1,0 +1,66 @@
+SELECT name, free_mb, total_mb, free_mb/total_mb*100 as percentage 
+     FROM v$asm_diskgroup;
+
+select name,total_mb/1024,free_mb/1024,state from v$asm_diskgroup;
+
+
+SELECT name, header_status, path FROM V$ASM_DISK 
+
+sudo ~oracle/asmadmin/create_asm_device_init
+
+set pagesize 200
+set linesize 200
+col path format a40
+SELECT name,header_status,path FROM V$ASM_DISK;
+
+alter diskgroup RECO add disk '/dev/oracleasm/disks/ASMDISK107';
+
+ALTER DISKGROUP DATA ADD DISK '/dev/oracleasm/disks/ASMDISK19' SIZE 131069M;
+
+select * from v$flash_recovery_area_usage;
+
+set lines 2000
+set pagesize 2000
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY_CURSOR('&sql_id'));
+5fwgdxu00z94y
+
+g9f85q9rwjb5t
+
+s0310d1o
+
+TAS000000295395
+TAS000000294838
+
+create restore point CRQ001000168633_04_2021 guarantee flashback database;
+
+SQL> select NAME,time from v$restore_point;
+
+NAME
+--------------------------------------------------------------------------------
+TIME
+---------------------------------------------------------------------------
+CRQ001000168633_04_2021
+04-DEC-21 09.32.36.000000000 AM
+
+
+   Thread Last Sequence Received Last Sequence Applied
+---------- ---------------------- ---------------------
+         3                  36183                 31689
+         4                  36126                 31644
+
+
+set linesize 500
+col NAME for a50
+select name, ROUND(SPACE_LIMIT/1024/1024/1024,2) "Allocated Space(GB)", 
+round(SPACE_USED/1024/1024/1024,2) "Used Space(GB)",
+round(SPACE_RECLAIMABLE/1024/1024/1024,2) "SPACE_RECLAIMABLE (GB)" ,
+(select round(ESTIMATED_FLASHBACK_SIZE/1024/1024/1024,2) 
+from V$FLASHBACK_DATABASE_LOG) "Estimated Space (GB)"
+from V$RECOVERY_FILE_DEST;
+
+
+
+
+
+

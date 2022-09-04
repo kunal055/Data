@@ -1,0 +1,236 @@
+nddbctl create database \
+--oracleHome /u01/app/oracle/product/19.10.0.0/db210119b \
+--createAsContainer \
+--nlsLengthSemantics char \
+--databaseType tiny \
+--databaseUniqueName b5432p1h \
+--useSGAMemory 16gb \
+--useCpuCount 4 \
+--useStorageCapacity 1tb \
+--useStorageIops 100000iops \
+--useStorageBandwidth 1gbps \
+--characterSet AL32UTF8 \
+--nationalCharacterSet AL16UTF16 \
+--runOnNodes db-s011hh01p,db-s011hh02p \
+--installOnNodes db-s011hh01p,db-s011hh02p,db-s011hh03p,db-s011hh04p \
+--prepareAsPrimary \
+--standbyScanListener db-s011oep-scan \
+--standbyDatabaseUniqueName b5432p1o \
+--standbyVip db-s011oe01p-vip.oneadr.net \
+--standbyAsmDataDiskGroup S011OEP_DATA \
+--standbyAsmRecoDiskGroup S011OEP_RECO
+
+
+nordea_environment_type=prod
+nordea_cluster_nodes="db-s006hh01p db-s006hh02p db-s006hh03p db-s006hh04p"
+nordea_rman_directories=/zfssa/zfs05oe1d/rmannonprod/rman10,/zfssa/zfs05oe1d/rmannonprod/rman20
+ndlogctl_mount_point_auditbackup=/zfssa/auditstage
+nordea_tmpwork=/zfssa/tmpwork
+nordea_availability_level=
+
+
+
+nddbctl create pdb \
+--pdbFreeName GPEOC \
+--pdbApplicationCode GOBI \
+--pdbEnvironment P \
+--databaseUniqueName b5420p1h \
+--useSGAMemory 16gb \
+--useCpuCount 8 \
+--useStorageCapacity 1tb \
+--useStorageIops 40000iops \
+--useStorageBandwidth 1gbps \
+--pdbPrimaryServicename GPEOCP \
+--pdbStandbyServicename GPEOCP_ro \
+--useNodes 1
+
+nddbctl dgfinish pdb --pdbName p_gpeoc_gobi_22021610_p --databaseUniqueName b5420p1o
+
+
+
+Add entry in tnsname.ora & nordea.tnsname.ora file in primary and standby db-
+
+b5428p1o =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oep-scan.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5428p1o)
+    )
+  )
+
+b5428p1o_DUP =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oep-scan.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5428p1o_DGMGRL)
+    )
+  )
+
+b5428p1h =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011hhp-scan.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5428p1h)
+    )
+  )
+
+Add entry in listener file in standby database-
+/u01/app/19.9.0.0/grid/network/admin
+
+/u01/app/oracle/product/19.10.0.0/db210119a
+
+    (SID_DESC =
+      (SID_NAME = b5428p1o2)
+      (ORACLE_HOME = /u01/app/oracle/product/19.10.0.0/db210119a)
+      (GLOBAL_DBNAME = b5428p1o)
+      (ENVS = "TNS_ADMIN=/clustershare/network/admin")
+    )
+    (SID_DESC =
+      (SID_NAME = b5428p1o2)
+      (ORACLE_HOME = /u01/app/oracle/product/19.10.0.0/db210119a)
+      (GLOBAL_DBNAME = b5428p1o_dgmgrl)
+      (ENVS = "TNS_ADMIN=/clustershare/network/admin")
+
+
+scp initb5430p1o2.ora pwdb5430p1h.6476.1101972871 db-s011oe02p:/u01/app/oracle/product/19.10.0.0/db210119b/dbs
+
+
+Create pfile in primary database and copy it on standby database in dbs location along with password file.(like initb0182d1o1.ora and orapwb0182d1o1)
+
+
+If mount point is diffrent add parameter in pfile-
+
+*.db_file_name_convert='+S011HHP_DATA','+S011OEP_DATA'
+*.log_file_name_convert='+S011HHP_RECO','+S011OEP_RECO'
+
+
+sqlplus sys@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3000)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-pdmxxx_conf_sboxs-a.qaoneadr.local)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=ora-pdmxxx_conf_sboxs-b.qaoneadr.local)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=pdmxxx_conf_sboxs)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC)))) as sysdba
+
+Set the enviorment and start database in nomount-
+
+export ORACLE_SID=b5428p1o4
+export ORACLE_UNQNAME=b5428p1o
+export ORACLE_HOME=/u01/app/oracle/product/19.10.0.0/db210119a
+export TNS_ADMIN=/clustershare/network/admin
+
+Connect on rman in standby.
+
+rman
+connect auxiliary sys@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-s012oe02p-vip.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(UR=A)(SID=h5290p1o)))
+connect target sys@h5290p1h
+
+Duplicate the database using below command-
+
+run{
+	allocate channel c1 device type disk;
+	allocate channel c2 device type disk;
+	allocate channel c3 device type disk;
+	allocate channel c4 device type disk;
+	allocate channel c5 device type disk;
+	allocate channel c6 device type disk;
+	allocate channel c7 device type disk;
+	allocate channel c8 device type disk;
+	allocate channel c9 device type disk;
+	allocate channel c10 device type disk;
+	allocate auxiliary channel aux1 device type disk;
+	allocate auxiliary channel aux2 device type disk;
+	allocate auxiliary channel aux3 device type disk;
+	allocate auxiliary channel aux4 device type disk;
+	allocate auxiliary channel aux5 device type disk;
+	allocate auxiliary channel aux6 device type disk;
+	allocate auxiliary channel aux7 device type disk;
+	allocate auxiliary channel aux8 device type disk;
+	allocate auxiliary channel aux9 device type disk;
+	allocate auxiliary channel aux10 device type disk;
+	duplicate target database for standby from active database nofilenamecheck;
+}
+
+On Primary database-
+
+
+alter system set log_archive_dest_2='service="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-s008oe01d-vip.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=h0664d1o)(SERVER=DEDICATED)))"','LGWR ASYNC NOAFFIRM db_unique_name="h0664d1o" valid_for=(all_logfiles,primary_role)' sid='*' scope=both;
+
+
+Alter System Set log_archive_dest_2='service="s4003t1o", ASYNC NOAFFIRM delay=0 optional compression=disable max_failure=0 max_connections=1 reopen=300 db_unique_name="s4003t1o" net_timeout=30,valid_for=(online_logfile,all_roles) service="s4003t1o", ASYNC NOAFFIRM delay=0 optional compression=disable max_failure=0 max_connections=1 reopen=300 db_unique_name="s4003t1o" net_timeout=30,valid_for=(online_logfile,all_roles)' scope=both sid='*';
+
+alter system set log_archive_dest_3='service="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=dm20-scan.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=cbpdt1c)(SERVER=DEDICATED)))"','LGWR ASYNC NOAFFIRM db_unique_name="cbpdt1c" valid_for=(all_logfiles,primary_role)' scope=both;
+ 		
+Alter System Set log_archive_config='DG_CONFIG=(b5428p1h,b5428p1o)'   	scope=both SID='*';
+Alter System Set log_archive_dest_2='SERVICE=b5428p1o ASYNC NOAFFIRM delay=0 reopen=300 net_timeout=30 VALID_FOR=(ONLINE_LOGFILES,all_roles) DB_UNIQUE_NAME=b5428p1o' SID='*' scope=both;
+Alter System Set fal_client='b5428p1h' 									scope=both SID='*';
+Alter System Set fal_server='b5428p1o' 									scope=both SID='*';
+Alter Database FORCE LOGGING;
+
+
+On Standby-
+
+
+Alter System Set fal_client='b5430p1o' 	scope=both SID='*';
+Alter System Set fal_server='b5430p1h' 	scope=both SID='*';
+Alter System Set log_archive_config='DG_CONFIG=(b5430p1o,b5430p1h)'   	scope=both SID='*';
+
+change cluster_database=true in pfile
+Create spfile on cluster by using pfile in standby database, Also copy the password on ASM dest by using beow -
+
+
+create spfile='+S011OEP_DATA' from pfile;
+
+Create password directory.
+
+S010OEP_DATA/b5377p1o/PASSWORD
+
+from asmcmd-
+
+pwcopy --dbuniquename h5290p1o /u01/app/oracle/product/12.2.0.1/db201020c/dbs/orapwh5290p1o +S012OEP_DATA/h5290p1o/PASSWORD
+
+srvctl modify database -d b5429p1o -spfile +S011OEP_DATA/b5429p1o/PARAMETERFILE/spfile.7590.1100335853
+srvctl modify database -d h5290p1o -pwfile +S012OEP_DATA/h5290p1o/PASSWORD/pwdh5290p1o.1412.1106264407
+
+
+Configure database into RAC-
+
+srvctl add database -db b5428p1o  -oraclehome /u01/app/oracle/product/19.10.0.0/db210119a -spfile +S011OEP_DATA/B5432P1O/PARAMETERFILE/spfile.7790.1101979369 -pwfile +S011OEP_DATA/b5428p1o/PASSWORD/pwdb5430p1o.7791.1101979499 -dbtype RAC -role PHYSICAL_STANDBY -startoption "read only" -stopoption immediate -dbname b5428p1o -diskgroup S011OEP_DATA,S011OEP_RECO
+
+Add standby database instance(node) into RAC -
+
+srvctl add instance -d b5428p1o  -i b5428p1o1 -node db-s011oe01p
+srvctl add instance -d b5428p1o  -i b5428p1o2 -node db-s011oe02p
+srvctl add instance -d b5428p1o  -i b5428p1o3 -node db-s011oe03p
+srvctl add instance -d b5428p1o  -i  b5428p1o4 -node db-s011oe04p
+
+
+
+srvctl add service -s whasep -d b5428p1o -preferred b5428p1o3 -pdb P_WHASE_WH_22032204_P
+
+srvctl add service -s whasep_ro -d b5428p1o  -preferred b5428p1o3 -pdb P_WHASE_WH_22032204_P -role PHYSICAL_STANDBY
+
+srvctl add service -s s_gobirr_gsip_21110312_t -d h0666d1o  -preferred h0666d1o -role PHYSICAL_STANDBY
+
+
+srvctl add service -s b5428p_ro -d b5428p1o -preferred b5428p1o3,b5428p1o2 -role PHYSICAL_STANDBY
+
+srvctl add service -s b5428p -d b5428p1o -preferred b5428p1o3,b5428p1o2 
+
+Configure DGMGRL-
+
+Create Configuration b5428p1h_dg as Primary Database is b5428p1h Connect Identifier is "(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-s011hhp-scan.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=b5428p1h)(SERVER=DEDICATED)))";
+
+
+Add Database b5428p1o as Connect Identifier is "(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-s011oep-scan.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=b5428p1o)(SERVER=DEDICATED)))" Maintained as Physical;
+
+Enable Configuration;
+
+
+
+
+
+Create Configuration b5402p1h_dg as Primary Database is b5402p1h Connect Identifier is b5402p1h;
+
+
+
+Add Database h0664d1o as Connect Identifier is "h0664d1o" Maintained as Physical;
+
+

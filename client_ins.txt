@@ -1,0 +1,16 @@
+sqlplus sys@(description_list=(description=(source_route=yes)(address=(protocol=tcp)(host=ap-isoracm1t)(port=1950))(address=(protocol=tcp)(host=ora-ndfcoms-a.qaoneadr.local)(port=1521))(connect_data=(server=dedicated)(service_name=ndfcoms)))(description=(source_route=yes)(address=(protocol=tcp)(host=ap-isoracm1t)(port=1950))(address=(protocol=tcp)(host=ora-ndfcoms-b.qaoneadr.local)(port=1521))(connect_data=(server=dedicated)(service_name=ndfcoms)))) as sysdba
+
+sqlplus sys@(DESCRIPTION =(LOAD_BALANCE = OFF)(FAILOVER = ON)(CONNECT_TIMEOUT = 5)(TRANSPORT_CONNECT_TIMEOUT = 3)(RETRY_COUNT = 3 )(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = ora-crmds-a.qaoneadr.local)(PORT = 1521))(ADDRESS = (PROTOCOL = TCP)(HOST = ora-crmds-b.qaoneadr.local)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = crmds)(FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC)))) as sysdba
+
+
+/u01/app/oracle/product/12.2.1/cl220816b/client_12201
+/u01/app/oracle/product/12.2.1
+
+
+client_install.rsp
+
+
+./runInstaller -ignoreSysPrereqs -showProgress -silent -responseFile /u01/app/oracle/product/12.2.1/cl220816b/client_12201/response/client_install.rsp
+
+
+wget https://is-sat6capoe1p.oneadr.net/pub/files/oracle_clients/19.15.0.0_cl220419a.zip

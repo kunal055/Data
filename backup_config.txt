@@ -1,0 +1,247 @@
+ALLOWD_NO_DG=YES 
+
+ALLOWD_NO_DG=YES ./sop_backup_init_19c.sh  s003 s0213t
+
+ALLOWD_NO_DG=YES ./sop_backup_init_19c.sh  s002 s0105t
+
+/me01/oracle/dbadmin/backup 
+
+
+./sop_backup_init_19c.sh  s007 b0495d
+
+./sop_backup_init_19c.sh  s006  h5097p
+
+./sop_backup_init_19c.sh  s003  b0497d
+
+./sop_backup_init_19c.sh  s012  s5384p
+
+./sop_backup_init_19c.sh  s012  h5415p
+
+./sop_backup_init_19c.sh  s006  h5099p
+
+
+
+sqlplus [h5142p]@rmanproxy
+
+sqlplus [s5384p]@rmanproxy
+
+select * from disk_backup_paths;
+
+/zfssa/vhh-n-hnas01/rmannonprod/rman10/s0212t1h
+
+
+
+
+h0657d1o Y
+/zfssa/zfs05oe1d/rmannonprod/rman20/h0657d1o
+
+
+rman target /@rman_s0313d1h catalog [s0313d]@rmanproxy
+
+
+rman target "'/@rman_s0313d1h as sysbackup'" catalog [s0313d]@rmanproxy
+On standby database-
+update disk_backup_paths set path ='/zfssa/vhh-p-ess03/rmanprod/rman10/h5099p1o' where DB_UNIQUE_NAME='h5099p1o' and path='/zfssa/vhh-p-ess03/rmanprod/rman10/h5099p1h';
+
+
+
+update disk_backup_paths set path ='/zfssa/vhh-p-ess03/rmanprod/rman20/h5099p1o' where DB_UNIQUE_NAME='h5099p1o' and path='/zfssa/vhh-p-ess03/rmanprod/rman20/h5099p1h';
+
+
+
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '/zfssa/vhh-p-ess03/rmanprod/rman20/h5099p1o/cf_h5099p1o_%F';
+
+select username,profile, account_status from dba_users where username='SYSBACKUP'; select * from DBA_SYS_PRIVS where GRANTEE='SYSBACKUP'; grant sysbackup to sysbackup; 
+alter user sysbackup identified by Pogo2last4ever;
+alter user sysbackup account unlock;
+
+
+(PASSWORD=$(cat /me01/oracle/dbadmin/.OSPS-key); echo; mkstore -wrl /oracle_shared/.orawallet1 -listCredential <<< "$PASSWORD"$'\n'; unset UPASSWORD; unset PASSWORD ) | grep b5429p
+
+
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '+s012oep_data/h5415p1o/CONTROLFILE/snapcf_h5415p1o.f';
+
+
+on standby database-
+
+nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_DB_ONLY="YES" ENV_FILE="/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg" TARGET_DATABASE="s0441t1" CAT_USER="s0441t" LEVEL0=YES &
+
+nohup /me01/oracle/dbadmin/backup/db_backup.sh  ENV_FILE="/me01/oracle/dbadmin/backup/sop_oe_test_19c.cfg" TARGET_DATABASE="s0444t1" CAT_USER="s0441t" BACKUP_ARCHIVE_ONLY=YES &
+
+INC000003200929
+nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=s0338t ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg TARGET_DATABASE=s0338t1 && /me01/oracle/dbadmin/backup/db_backup.sh BBACKUP_ARCHIVE_ONLY=YES CAT_USER=s0441t ENV_FILE=/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg TARGET_DATABASE=s0441t1 &
+
+sop_hh_test_19c.cfg
+
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s011 b5429p
+Database Name:- b5429p1h
+Hostname:- db-s011hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s011 b5407p
+Database Name:- b5429p1o
+Hostname:-  db-s011oep
+
+-----------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s011 b5408p
+Database Name:- b5408p1h
+Hostname:- db-s011hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s011 b5408p
+Database Name:- b5408p1o
+Hostname:- db-s011oep
+----------------------------------------------------------
+
+/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg s009 s4007t
+Database Name:- s4007t1h
+Hostname:- db-s009hhd
+-----------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_oe_test_19c.cfg s008 s0312d
+Database Name-s0312d1o
+hostname-db-s008oed
+
+-------------------------------------------------------------------
+
+/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg s008 s0313d
+Database Name-s0313d1h
+hostname-db-s008hhd
+
+------------------------------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg s009 b0448d
+Database Name-b0448d1h
+hostname-db-s009hhd
+
+/me01/oracle/dbadmin/backup/sop_oe_test_19c.cfg s009 b0448d
+Database Name-b0448d1o
+hostname-db-s009oed
+----------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_oe_test_19c.cfg s009 s4009t
+Database Name-s4009t1o
+hostname-db-s009oed
+
+------------------------------------------------------------------------------------------
+
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s012 s5384p
+Database Name:- s5384p1h
+Hostname:- db-s012hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s012 s5384p
+Database Name:- s5384p1o
+Hostname:- db-s012oep
+----------------------------------------------------------------
+
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s012 h5415p
+Database Name:- h5415p1h
+Hostname:- db-s012hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s012 h5415p
+Database Name:- h5415p1o
+Hostname:- db-s012oep
+
+---------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s006 h5099p
+Database Name:- h5099p1h
+Hostname:- db-s006hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s006 h5099p
+Database Name:- h5099p1o
+Hostname:- db-s006oep
+
+
+[5:08 AM] Baskaran, Karthick
+sop_hh_test_19c.cfg
+
+[5:09 AM] Baskaran, Karthick
+sop_oe_test_19c.cfg
+
+[5:09 AM] Baskaran, Karthick
+exa_hh_test.cfg
+
+[5:09 AM] Baskaran, Karthick
+exa19_hh_test.cfg
+
+[5:10 AM] Baskaran, Karthick
+exa19_cb_test19c.cfg
+
+-----------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s011  b5412p
+Database Name:-  b5412p1h
+Hostname:- db-s011hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s011  b5412p
+Database Name:-  b5412p1o
+Hostname:-  db-s011oep
+---------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s011  b5409p
+Database Name:-  b5409p1h
+Hostname:- db-s011hhp
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s011  b5409p
+Database Name:-  b5409p1o
+Hostname:-  db-s011oep
+
+
+---------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s007 f0188t
+Database Name:-  f0188t1h
+Hostname:- db-s007hhd
+----------------------------------------------------------------------------------------
+
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s001 s0212t
+Database Name:-  s0212t1h
+Hostname:- db-s001hhd
+--------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_oe_prod_19c.cfg s007 s0213t
+Database Name:-  s0213t1o
+Hostname:- db-s003oed
+---------------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s012  s5382p
+Database Name:-  s5382p1h
+Hostname:- db-s012hhp
+
+-------------------------------------------------------------------------------------------
+/me01/oracle/dbadmin/backup/sop_hh_prod_19c.cfg s012  s5383p
+Database Name:-  s5382p1h
+Hostname:- db-s012hhp
+
+
+
+
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '/zfssa/zfs05oe1d/rmannonprod/rman20/s0457d1o/cf_s0457d1o_%F';
+
+
+
+
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '+s009oed_data/h0663d1o/CONTROLFILE/snapcf_s0457d1o.f';
+
+
+
+connect catalog bspppx/cat_bsppp@rmanp
+
+run {
+allocate channel c1 type  'SBT_TAPE' PARMS  'ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_cb.opt)';
+restore archivelog FROM SEQUENCE 600803 UNTIL SEQUENCE 600829;
+release channel c1;
+}
+
+
+
+
+run {
+allocate channel c1 type 'SBT' PARMS='ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_local.opt)';
+restore archivelog FROM SEQUENCE 601031 UNTIL SEQUENCE 601898;
+release channel c1;
+}
+
+
+
+
+run {
+    allocate channel c1 type 'SBT' PARMS='ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_local.opt)' maxpiecesize=104857600K MAXOPENFILES
+=30;
+3>   sql channel c1 "alter session set events ''10466 trace name context forever, level 1''";
+4>
+5>    backup
+6>       filesperset 30
+7>       copies 2
+8>       format 'ora_arc_%d_t%t_s%s_p%p_c%c', 'ora_arc_duplex_%d_t%t_s%s_p%p_c%c'
+9>       tag 'bsppp_arch_20220325_055720'
+10>       archivelog all;
+11>
+12>    release channel c1;
+13> }
+
+
+nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY="YES" ENV_FILE="/me01/oracle/dbadmin/backup/sop_hh_test_19c.cfg" TARGET_DATABASE="s0212t1" CAT_USER="s0212t"  &

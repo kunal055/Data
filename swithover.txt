@@ -1,0 +1,14 @@
+nddbctl switchover database --databaseUniqueName h5007p1h--dryRun
+
+nddbctl switchover database --databaseUniqueName h5007p1h
+
+gsctp1h
+
+
+connest sys@primary
+switchover to 'standby'
+
+
+
+P_APC_APC_18120613_P
+h5007p1h

@@ -1,0 +1,49 @@
+ssh root@db-e901oe02d-adm.qaoneadr.local
+password :- welcome1
+
+ssh cel-e901oe09d-adm
+password :- welcome1
+
+cellcli
+
+cellcli> list griddisk attributes name,asmmodestatus,asmdeactivationoutcome
+
+cellcli> alter griddisk all inactive
+
+cellcli> list griddisk attributes name,asmmodestatus,asmdeactivationoutcome
+
+cellcli> exit
+
+~]#ssh cel-e901oe09d-ilom
+password :- welcome1
+
+Oracle(R) Integrated Lights Out Manager
+
+Version 5.0.1.21 r136383
+
+Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+
+Warning: HTTPS certificate is set to factory default.
+
+Hostname: cel-e901oe09d-ilom
+
+-> show /System power_state
+
+ /System
+    Properties:
+        power_state = On
+
+
+->stop /SYSTEM
+=====================================================================
+-> start /SYSTEM
+
+exit
+
+ssh root@cel-e901oe09d-adm
+password :- welcome1
+
+cellcli
+
+cellcli> alter griddisk all active
+cellcli> list griddisk attributes name,asmmodestatus,asmdeactivationoutcome

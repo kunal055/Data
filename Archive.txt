@@ -1,0 +1,8 @@
+Archive generation daily basis.
+
+select to_char(COMPLETION_TIME,'DD-MON-YYYY') Arch_Date,count(*) No#_Logs,
+sum((BLOCKS*512)/1024/1024/1024) Arch_LogSize_GB 
+from v$archived_log 
+where to_char(COMPLETION_TIME,'DD-MON-YYYY')>=trunc(sysdate-7) and DEST_ID=1
+group by to_char(COMPLETION_TIME,'DD-MON-YYYY')
+order by to_char(COMPLETION_TIME,'DD-MON-YYYY');

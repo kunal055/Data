@@ -1,0 +1,95 @@
+
+SQLPLAN for -5fwgdxu00z94y
+
+PLAN_TABLE_OUTPUT
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  5fwgdxu00z94y, child number 0
+-------------------------------------
+select count(*)    into :b1  from IXQDBAMD AMD1 where
+(((AMD1.ENTITY=:b2 and SUBSTR(AMD1.DEAL_NO,6,2)=:b3) and
+AMD1.PREV_SEARCH_KEY=:b4) and (AMD1.DEAL_NO,AMD1.STEP_ID)=(select
+DEAL_NO  ,max(STEP_ID)   from IXQDBAMD AMD2 where
+(((AMD1.ENTITY=AMD2.ENTITY and AMD1.DEAL_NO=AMD2.DEAL_NO) and
+AMD2.DEAL_NO<>:b5) and AMD2.PREV_SEARCH_KEY>' ') group by AMD2.DEAL_NO))
+
+Plan hash value: 753629843
+
+--------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name         | Rows  | Bytes | Cost (%CPU)| Time     | Pstart| Pstop |
+--------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |              |       |       |  1452 (100)|          |       |       |
+|   1 |  SORT AGGREGATE                     |              |     1 |    87 |            |          |       |       |
+|*  2 |   TABLE ACCESS BY GLOBAL INDEX ROWID| IXQDBAMD     |     1 |    87 |  1450   (1)| 00:00:01 | ROWID | ROWID |
+|*  3 |    INDEX RANGE SCAN                 | IXQDBAMD_PK  |     1 |       |  1450   (1)| 00:00:01 |       |       |
+|   4 |     SORT GROUP BY NOSORT            |              |     1 |    87 |     1   (0)| 00:00:01 |       |       |
+|*  5 |      FILTER                         |              |       |       |            |          |       |       |
+|*  6 |       INDEX RANGE SCAN              | IXQDBAMD_IA1 |     1 |    87 |     1   (0)| 00:00:01 |       |       |
+--------------------------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   2 - filter("AMD1"."PREV_SEARCH_KEY"=:B4)
+   3 - access("AMD1"."ENTITY"=:B2)
+       filter((SUBSTR("AMD1"."DEAL_NO",6,2)=:B3 AND "AMD1"."DEAL_NO"= AND "AMD1"."STEP_ID"=))
+   5 - filter(:B5<>:B1)
+   6 - access("AMD2"."ENTITY"=:B1 AND "AMD2"."DEAL_NO"=:B2 AND "AMD2"."PREV_SEARCH_KEY">' ')
+       filter(("AMD2"."PREV_SEARCH_KEY">' ' AND "AMD2"."DEAL_NO"<>:B5))
+
+
+33 rows selected.
+====================================================================================================================
+
+SQL Plan for -g9f85q9rwjb5t
+
+Enter value for sql_id: g9f85q9rwjb5t
+old   1: SELECT * FROM table(DBMS_XPLAN.DISPLAY_CURSOR('&sql_id'))
+new   1: SELECT * FROM table(DBMS_XPLAN.DISPLAY_CURSOR('g9f85q9rwjb5t'))
+
+PLAN_TABLE_OUTPUT
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  g9f85q9rwjb5t, child number 0
+-------------------------------------
+select *  from IXQDBWIT WIT where ((((((((((((WIT.CURRENT_ENTITY=:b1
+and WIT.ITEM_REF_NO=:b2) and WIT.CURRENT_DEPT_ID between :b3 and :b4)
+and WIT.CURRENT_SECTION between :b5 and :b6) and WIT.CURRENT_USER_ID
+between :b7 and :b8) and WIT.SENDER_ID between :b9 and :b10) and
+WIT.CUSTOMER_ID between :b11 and :b12) and WIT.DEAL_NO between :b13 and
+:b14) and WIT.CREATED_TIME_STAMP between :b15 and :b16) and
+WIT.ITEM_PROFILE between :b17 and :b18) and WIT.ITEM_CURRENCY between
+:b19 and :b20) and WIT.AMOUNT between :b21 and :b22) and
+WIT.PRIORITY_CODE between :b23 and :b24) order by 21 desc ,22,23
+
+Plan hash value: 4111545468
+
+-----------------------------------------------------------------------------------------------------------------
+| Id  | Operation                            | Name     | Rows  | Bytes | Cost (%CPU)| Time     | Pstart| Pstop |
+-----------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                     |          |       |       |   151K(100)|          |       |       |
+|   1 |  SORT ORDER BY                       |          |     1 |   417 |   151K  (1)| 00:00:06 |       |       |
+|*  2 |   FILTER                             |          |       |       |            |          |       |       |
+|   3 |    PARTITION LIST ALL                |          |     1 |   417 |   151K  (1)| 00:00:06 |     1 |     2 |
+|*  4 |     TABLE ACCESS BY LOCAL INDEX ROWID| IXQDBWIT |     1 |   417 |   151K  (1)| 00:00:06 |     1 |     2 |
+|*  5 |      INDEX SKIP SCAN                 | IXI02WIT |  4148K|       |  2495   (1)| 00:00:01 |     1 |     2 |
+-----------------------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   2 - filter((:B24>=:B23 AND :B22>=:B21 AND :B20>=:B19 AND :B18>=:B17 AND :B16>=:B15 AND :B14>=:B13 AND
+              :B12>=:B11 AND :B10>=:B9 AND :B8>=:B7 AND :B6>=:B5 AND :B4>=:B3))
+   4 - filter(("WIT"."ITEM_REF_NO"=:B2 AND "WIT"."CURRENT_ENTITY"=:B1 AND
+              "WIT"."CREATED_TIME_STAMP"<=:B16 AND "WIT"."CURRENT_USER_ID">=:B7 AND "WIT"."CURRENT_USER_ID"<=:B8 AND
+              "WIT"."SENDER_ID">=:B9 AND "WIT"."SENDER_ID"<=:B10 AND "WIT"."CUSTOMER_ID">=:B11 AND
+              "WIT"."CUSTOMER_ID"<=:B12 AND "WIT"."DEAL_NO">=:B13 AND "WIT"."DEAL_NO"<=:B14 AND
+              "WIT"."CREATED_TIME_STAMP">=:B15 AND "WIT"."ITEM_PROFILE">=:B17 AND "WIT"."ITEM_PROFILE"<=:B18 AND
+              "WIT"."ITEM_CURRENCY">=:B19 AND "WIT"."ITEM_CURRENCY"<=:B20 AND "WIT"."AMOUNT">=:B21 AND
+              "WIT"."AMOUNT"<=:B22 AND "WIT"."PRIORITY_CODE">=:B23 AND "WIT"."PRIORITY_CODE"<=:B24))
+   5 - access("WIT"."CURRENT_DEPT_ID">=:B3 AND "WIT"."CURRENT_SECTION">=:B5 AND
+              "WIT"."CURRENT_DEPT_ID"<=:B4 AND "WIT"."CURRENT_SECTION"<=:B6)
+       filter(("WIT"."CURRENT_DEPT_ID">=:B3 AND "WIT"."CURRENT_DEPT_ID"<=:B4 AND
+              "WIT"."CURRENT_SECTION">=:B5 AND "WIT"."CURRENT_SECTION"<=:B6))
+
+
+
+

@@ -1,0 +1,125 @@
+vi bkup.ksh
+#!/bin/ksh
+export ORACLE_SID=h0650d1o
+export ORACLE_HOME=/u01/app/oracle/product/19.9.0.0/db201020d
+export PATH=$PATH1:$ORACLE_HOME/bin
+rman target 'sys/Dune2last4ever'@h0650d1h auxiliary 'sys/Dune2last4ever'@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-s001oe01d-vip.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(UR=A)(SID=h0650d1o1))) & msglog /home/oracle/rman/rman_bkup.log cmdfile=/home/oracle/rman.cmd
+
+SET LINESIZE 145
+SET PAGESIZE 9999
+
+COLUMN sid HEADING 'Oracle|SID'
+COLUMN serial_num HEADING 'Serial|#'
+COLUMN opname FORMAT a25 HEADING 'RMAN|Operation'
+COLUMN start_time FORMAT a18 HEADING 'Start|Time'
+COLUMN totalwork HEADING 'Total|Work'
+COLUMN sofar HEADING 'So|Far'
+COLUMN pct_done HEADING 'Percent|Done'
+COLUMN elapsed_seconds HEADING 'Elapsed|Seconds'
+COLUMN time_remaining HEADING 'Seconds|Remaining'
+COLUMN done_at FORMAT a18 HEADING 'Done|At'
+SELECT
+sid sid
+, serial# serial_num
+, b.opname opname
+, TO_CHAR(b.start_time, 'mm/dd/yy HH24:MI:SS') start_time
+, b.totalwork totalwork
+, b.sofar sofar
+, ROUND( (b.sofar/DECODE( b.totalwork
+, 0
+, 0.001
+, b.totalwork)*100),2) pct_done
+, b.elapsed_seconds elapsed_seconds
+, b.time_remaining time_remaining
+, DECODE( b.time_remaining
+, 0
+, TO_CHAR((b.start_time + b.elapsed_seconds/3600/24), 'mm/dd/yy HH24:MI:SS')
+, TO_CHAR((SYSDATE + b.time_remaining/3600/24), 'mm/dd/yy HH24:MI:SS')
+) done_at
+FROM
+v$session a
+JOIN v$session_longops b USING (sid,serial#)
+WHERE
+a.program LIKE 'rman%'
+AND b.opname LIKE 'RMAN%'
+---AND b.opname NOT LIKE '%aggregate%'
+AND b.totalwork > 0
+AND b.opname like '%aggregate%'
+ORDER BY
+b.start_time
+/
+
+------------------------------------------------------------------------------------------------------------------------
+SET LINESIZE 145
+SET PAGESIZE 9999
+COLUMN sid HEADING 'Oracle|SID'
+COLUMN serial_num HEADING 'Serial|#'
+COLUMN opname FORMAT a25 HEADING 'RMAN|Operation'
+COLUMN start_time FORMAT a18 HEADING 'Start|Time'
+COLUMN totalwork HEADING 'Total|Work'
+COLUMN sofar HEADING 'So|Far'
+COLUMN pct_done HEADING 'Percent|Done'
+COLUMN elapsed_seconds HEADING 'Elapsed|Seconds'
+COLUMN time_remaining HEADING 'Seconds|Remaining'
+COLUMN done_at FORMAT a18 HEADING 'Done|At'
+SELECT
+sid sid
+, serial# serial_num
+, b.opname opname
+, TO_CHAR(b.start_time, 'mm/dd/yy HH24:MI:SS') start_time
+, b.totalwork totalwork
+, b.sofar sofar
+, ROUND( (b.sofar/DECODE( b.totalwork
+, 0
+, 0.001
+, b.totalwork)*100),2) pct_done
+, b.elapsed_seconds elapsed_seconds
+, b.time_remaining time_remaining
+, DECODE( b.time_remaining
+, 0
+, TO_CHAR((b.start_time + b.elapsed_seconds/3600/24), 'mm/dd/yy HH24:MI:SS')
+, TO_CHAR((SYSDATE + b.time_remaining/3600/24), 'mm/dd/yy HH24:MI:SS')
+) done_at
+FROM
+v$session a
+JOIN v$session_longops b USING (sid,serial#)
+WHERE
+a.program LIKE 'rman%'
+AND b.opname LIKE 'RMAN%'
+---AND b.opname NOT LIKE '%aggregate%'
+AND b.totalwork > 0
+AND b.opname like '%aggregate%'
+ORDER BY
+b.start_time
+/
+
+---------------------------------------------------------
+set pagesize 100
+set lin 200
+col EVENT format a30
+col OBJECT_NAME format a30
+col SQL_OPNAME format a20
+col sql_id format a20
+col owner format a20select * from (
+select SQL_OPNAME,sql_id ,sql_plan_hash_value,NVL(event,'CPU') Event,count(*),round((ratio_to_report(sum(1)) over ()*100),1) rr,o.object_name,o.owner
+from gv$active_session_history a, dba_objects o
+where 1=1
+and a.CURRENT_OBJ#=o.object_id
+AND event LIKE '%&wait%'
+--AND event IS null
+and user_id<>0
+AND sql_id IS NOT NULL
+group by SQL_OPNAME,sql_id,sql_plan_hash_value,event,force_matching_signature,CURRENT_OBJ#,o.object_name,o.owner
+order by 5 desc
+) where rownum<30;
+
+------------------------------------------------------------------------------------------------
+
+col opname format a15
+set lines 1900
+set pagesize 1000select sid, SERIAL#, opname, target, sofar, totalwork, START_TIME, round(TIME_REMAINING/60) Minutes_Remain, (totalwork-sofar)/totalwork*100 "% left"
+from gv$session_longops where round(TIME_REMAINING/60) > 0 order by sid;
+
+
+
+

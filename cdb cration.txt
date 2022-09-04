@@ -1,0 +1,95 @@
+nddbctl create database \
+--oracleHome /u01/app/oracle/product/19.10.0.0/db210119a \
+--createAsContainer \
+--nlsLengthSemantics char \
+--databaseType tiny \
+--databaseUniqueName b5377p1h \
+--useSGAMemory 32gb \
+--useCpuCount 4 \
+--useStorageCapacity 10tb \
+--useStorageIops 100000iops \
+--useStorageBandwidth 1gbps \
+--characterSet AL32UTF8 \
+--nationalCharacterSet AL16UTF16 \
+--runOnNodes db-s010hh03p,db-s010hh04p \
+--installOnNodes db-s010hh01p,db-s010hh02p,db-s010hh03p,db-s010hh04p \
+--prepareAsPrimary \
+--standbyScanListener db-s010oep-scan \
+--standbyDatabaseUniqueName b5377p1o \
+--standbyVip db-s010oe03p-vip.qaoneadr.local \
+--standbyAsmDataDiskGroup S010OEP_DATA \
+--standbyAsmRecoDiskGroup S010OEP_RECO
+
+PDB Creation
+
+nddbctl create pdb \
+--pdbFreeName cdp7oet \
+--pdbApplicationCode CDP \
+--pdbEnvironment T \
+--databaseUniqueName b5377p1h \
+--useSGAMemory 4gb \
+--useCpuCount 2 \
+--useStorageCapacity 1tb \
+--useStorageIops 40000iops \
+--useStorageBandwidth 1gbps \
+--pdbPrimaryServicename WHAFIP \
+--pdbStandbyServicename WHAFIP_ro \
+--useNodes 1
+
+
+
+create spfile='+S010OEP_DATA' from pfile='/u01/app/oracle/product/19.10.0.0/db210119a/dbs/initb5377p1o3.ora';
+
+
+pwcopy --dbuniquename b5377p1o /u01/app/oracle/product/19.10.0.0/db210119a/dbs/orapwb5377p1o3 +S010OEP_DATA/b5377p1o/PASSWORD
+
+S010OEP_DATA/b5377p1o/PASSWORD
+
+S010OEP_DATA/b5377p1o/PARAMETERFILE
+
+srvctl add database -db b5377p1o -oraclehome /u01/app/oracle/product/19.10.0.0/db210119a -spfile +S010OEP_DATA/b5377p1o/PARAMETERFILE/spfile.6591.1086008881 -pwfile +S010OEP_DATA/b5377p1o/PASSWORD/pwdb5377p1o.6592.1086009205 -dbtype RAC -role PHYSICAL_STANDBY -startoption "read only" -stopoption immediate -dbname b5377p -diskgroup S010OEP_DATA,S010OEP_RECO
+
+
+
+srvctl add instance -d b5377p1o -i b5377p1o3 -node db-s010oe03p
+srvctl add instance -d b5377p1o -i b5377p1o4 -node db-s010oe04p
+
+s_whafip_wh_21101512_p
+b5377p_ro
+whafip
+
+
+[4:31 AM] Gupta, Sajal
+
+srvctl add service -s rman_b5380p1o -d b5380p1o -preferred b5380p1o3
+
+srvctl add service -s b5377p_ro -d b5377p1o -preferred b5377p1o3
+srvctl add service -s whafip -d b5377p1o -preferred b5377p1o3
+srvctl add service -s s_whafip_wh_21101512_p -d b5377p1o -preferred b5377p1o3
+srvctl start service -d b5377p1o -s s_whafip_wh_21101512_p
+
+srvctl start service -s s_whafip_wh_21101512_p -d b5377p1o
+
+
+
+Primary-
+
+Create Configuration b5377p1h_dg as Primary Database is b5377p1h Connect Identifier is b5377p1h;
+select * from ssp.my_orders_v_v2 where environment_id='itssp' and requested_by='G82521' and lower(display_status)
+in ('initial', 'working', 'waiting approval', 'scheduled', 'submitted to cosmos', 'planning', 'waiting', 'in shopping cart', 'pending', 'submitting to cosmos')
+order by requested_date desc
+;
+
+
+
+
+
+Add Database b5377p1o as Connect Identifier is "(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-s010OEp-scan)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=b5377p1o)(SERVER=DEDICATED)))" Maintained as Physical;
+
+
+
+
+Show Configuration;
+Show Database Verbose b5380p1o;
+
+

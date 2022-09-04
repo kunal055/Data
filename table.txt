@@ -1,0 +1,17 @@
+Table_size-
+select sum(bytes)/1024/1024/1024 from dba_segments where segment_name='&TABLE_NAME';
+
+
+
+select table_name,last_analyzed,stale_stats from user_tab_statistics where table_name='&TABLE_NAME';
+
+select TABLE_NAME,STATTYPE_LOCKED,LAST_ANALYZED from dba_tab_statistics where table_name='RISK_INTEREST_PRODUCT' and owner='MARSP' and STALE_STATS='YES'
+select TABLE_NAME,STATTYPE_LOCKED,LAST_ANALYZED from dba_tab_statistics where table_name='RISK' and owner='MARSP' and STALE_STATS='YES';
+EXEC dbms_stats.gather_table_stats(ownname => 'TABLE_OWNER', tabname => 'TABLE_NAME', method_opt=> 'for all indexed columns size skewonly', granularity => 'ALL', degree => 8 ,cascade => true,estimate_percent => 15);
+db-infop-hh1
+RISK_INTEREST_PRODUCT
+RISK
+
+
+
+	

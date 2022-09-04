@@ -1,0 +1,230 @@
+FUNCTION put_queue_message(pSameTrans VARCHAR2,pSubject VARCHAR2,pMessage VARCHAR2,pQueue VARCHAR2,pQueueOwner VARCHAR2 := 'BL',
+pRecipients DBMS_AQ.aq$_recipient_list_t,pEnqueuer VARCHAR2 := NULL, pCorrelationID VARCHAR2 := NULL,
+pMessageTypeName VARCHAR2 := 'BL_MESSAGE',pDelay INTEGER := DBMS_AQ.NO_DELAY,
+pExpiration INTEGER := DBMS_AQ.NEVER,pPriority VARCHAR2 := 'NORMAL') RETURN VARCHAR2 IS
+lQueueOptions DBMS_AQ.ENQUEUE_OPTIONS_T;
+lMessageProperties DBMS_AQ.MESSAGE_PROPERTIES_T;
+lCorrelationID VARCHAR2(4000);
+lLoad CLOB := EMPTY_CLOB();
+lMessage sm_aq_message;
+BEGIN
+-- Put_queue_message instance 2b
+-- Message is VARCHAR and Recipients is object
+-- This procedure will propagate to instance 3
+dbms_lob.createtemporary(lLoad,TRUE);
+DBMS_LOB.WRITE(lLoad,LENGTH(pmessage),1,pmessage);
+lCorrelationID := put_queue_message(pSameTrans,pSubject,lLoad,pQueue,pQueueOwner,pRecipients,pEnqueuer,pCorrelationID,
+pMessageTypeName,pDelay,pExpiration,pPriority);
+RETURN lCorrelationID;
+--COMMIT; -- Controlled by enqueuer..................
+--/
+-- Exceptions must be handled by enqueuer
+--\
+/*
+EXCEPTION
+WHEN OTHERS THEN
+gErrm := SQLERRM;
+INSERT INTO bl.C1 VALUES ('ENQUEUE, VARCHAR2 + RECIPIENT LIST (AQ LIST): '||gErrm);COMMIT;
+RETURN(lExpMsgId);
+*/
+END put_queue_message;
+--------------------------------------------------------------------------------------------
+FUNCTION put_queue_message(pSameTrans VARCHAR2,pSubject VARCHAR2,pMessage CLOB,pQueue VARCHAR2,pQueueOwner VARCHAR2 := 'BL',
+pRecipients DBMS_AQ.aq$_recipient_list_t,pEnqueuer VARCHAR2 := NULL, pCorrelationID VARCHAR2 := NULL,
+pMessageTypeName VARCHAR2 := 'BL_MESSAGE',pDelay INTEGER := DBMS_AQ.NO_DELAY,
+pExpiration INTEGER := DBMS_AQ.NEVER,pPriority VARCHAR2 := 'NORMAL') RETURN VARCHAR2 IS
+lQueueOptions DBMS_AQ.ENQUEUE_OPTIONS_T;
+lMessageProperties DBMS_AQ.MESSAGE_PROPERTIES_T;
+lMsgid RAW(16);
+lMessageIM im_message;
+lMessageBL sm_aq_message;
+lCorrelationID VARCHAR2(4000);
+lEnqueueStr VARCHAR2(32000);
+BEGIN
+-- Put_queue_message instance 3
+-- Message is CLOB and Recipients is object
+-- This procedure will not propagate
+
+
+
+IF pSameTrans = 'TRUE' THEN
+lQueueOptions.visibility := DBMS_AQ.ON_COMMIT;
+ELSE
+lQueueOptions.visibility := DBMS_AQ.IMMEDIATE;
+END IF;
+
+
+
+IF pCorrelationID IS NOT NULL THEN
+lCorrelationID := pCorrelationID;
+ELSE
+SELECT aq_seq.NEXTVAL
+INTO lCorrelationID
+FROM dual;
+END IF;
+--/
+-- MessageOptions
+lMessageProperties.DELAY := pDelay;
+lMessageProperties.EXPIRATION := pExpiration;
+lMessageProperties.CORRELATION := lCorrelationID;
+lMessageProperties.RECIPIENT_LIST := pRecipients;
+lMessageProperties.SENDER_ID := sys.aq$_agent(pEnqueuer,NULL,NULL);
+CASE UPPER(pPriority)
+WHEN 'LOW' THEN lMessageProperties.priority := Sm_Aq_Util.lPrioLow;
+WHEN 'NORMAL' THEN lMessageProperties.priority := Sm_Aq_Util.lPrioNorm;
+WHEN 'HIGH' THEN lMessageProperties.priority := Sm_Aq_Util.lPrioHigh;
+WHEN 'URGENT' THEN lMessageProperties.priority := Sm_Aq_Util.lPrioUrg;
+END CASE;
+--
+IF pMessageTypeName = 'BL_MESSAGE' THEN
+lMessageBL := sm_aq_message(pSubject,pMessage);
+DBMS_AQ.ENQUEUE(
+pQueueOwner||'.'||pQueue,
+lQueueOptions,
+lMessageProperties,
+lMessageBL,
+lMsgid);
+ELSIF pMessageTypeName = 'IM_MESSAGE' THEN
+lMessageIM := im_message(pSubject,pMessage);
+DBMS_AQ.ENQUEUE(
+pQueueOwner||'.'||pQueue,
+lQueueOptions,
+lMessageProperties,
+lMessageIM,
+lMsgid);
+END IF;
+RETURN(lCorrelationID);
+--COMMIT; -- Controlled by enqueuer....................
+--/
+-- Exceptions must be handled by dequeuer
+--\
+/*
+EXCEPTION
+WHEN OTHERS THEN
+gErrm := SQLERRM;
+INSERT INTO bl.C1 VALUES ('ENQUEUE, CLOB + RECIPIENT LIST (AQ LIST): '||gErrm);COMMIT;
+RETURN(lExpMsgId);
+*/
+END put_queue_message;
+--------------------------------------------------------------------------------------------
+PROCEDURE get_queue_message(pQueue VARCHAR2, pQueueOwner VARCHAR2 := 'BL',pConsumer VARCHAR2,pWait VARCHAR2 := 'FOREVER',
+pEnqueuedBy OUT VARCHAR2,pSubject OUT VARCHAR2,pMessage OUT VARCHAR2, pCorrelationID OUT VARCHAR2,
+pMessageTypeName VARCHAR2 := 'BL_MESSAGE',pNavigation VARCHAR2 := 'NEXT', pCorrelationIdWait VARCHAR2) IS
+lCount NUMBER := 32000;
+lReceive VARCHAR2(32000);
+lExtMsgId VARCHAR2(2000);
+lLoad CLOB := EMPTY_CLOB();
+BEGIN
+pMessage := ' ';
+dbms_lob.createtemporary(lLoad,TRUE);
+DBMS_LOB.WRITE(lLoad,LENGTH(pmessage),1,pmessage);
+get_queue_message(pQueue, pQueueOwner,pConsumer,pWait,pEnqueuedBy,pSubject,lLoad,pCorrelationID,pMessageTypeName,pNavigation,pCorrelationIdWait);
+
+
+
+DBMS_LOB.READ(lload,lCount,1,lReceive);
+pMessage := lReceive;
+
+
+
+--/
+-- Exceptions must be handled by dequeuer
+--\
+/*
+EXCEPTION
+WHEN OTHERS THEN
+gErrm := SQLERRM;
+INSERT INTO bl.C1 VALUES ('DEQUEUE (VARCHAR2): '||gErrm);COMMIT;
+*/
+END get_queue_message;
+--------------------------------------------------------------------------------------------
+PROCEDURE get_queue_message(pQueue VARCHAR2, pQueueOwner VARCHAR2 := 'BL',pConsumer VARCHAR2,pWait VARCHAR2 := 'FOREVER',
+pEnqueuedBy OUT VARCHAR2,pSubject OUT VARCHAR2,pMessage OUT CLOB, pCorrelationID OUT VARCHAR2,
+pMessageTypeName VARCHAR2 := 'BL_MESSAGE',pNavigation VARCHAR2 := 'NEXT', pCorrelationIdWait VARCHAR2) IS
+lDequeueOptions DBMS_AQ.DEQUEUE_OPTIONS_T;
+lMessageProperties DBMS_AQ.MESSAGE_PROPERTIES_T;
+lMsgid RAW(16);
+lMessageIM im_message;
+lMessageBL sm_aq_message;
+lCount NUMBER := 32000;
+lReceive VARCHAR2(32000);
+lExtMsgId VARCHAR2(2000);
+lWaitInSeconds INTEGER;
+lEnqueuerStr VARCHAR2(100);
+lEnqueuerType sys.AQ$_AGENT;
+
+
+
+BEGIN
+--/
+-- DequeueOptions
+--
+-- Determine navigation
+-- NOTE!! If pCorrelationIdWait is specified "navigation" will be set to FIRST
+IF pNavigation = 'FIRST' OR pCorrelationIdWait IS NOT NULL THEN
+lDequeueOptions.navigation := dbms_aq.FIRST_MESSAGE;
+ELSE
+lDequeueOptions.navigation := dbms_aq.NEXT_MESSAGE;
+END IF;
+CASE UPPER(pWait)
+WHEN 'FOREVER' THEN lDequeueOptions.wait := dbms_aq.FOREVER;
+WHEN 'NO_WAIT' THEN lDequeueOptions.wait := dbms_aq.NO_WAIT;
+ELSE lWaitInSeconds := TO_NUMBER(pWait);
+lDequeueOptions.wait := lWaitInSeconds;
+END CASE;
+
+
+
+lDequeueOptions.consumer_name := pConsumer;
+lDequeueOptions.correlation := pCorrelationIDWait;
+IF pMessageTypeName = 'BL_MESSAGE' THEN
+DBMS_AQ.DEQUEUE(
+pQueueOwner||'.'||pQueue,
+lDequeueOptions,
+lMessageProperties,
+lMessageBL,
+lMsgid);
+DBMS_LOB.READ(lmessageBL.subject,lCount,1,lReceive);
+pSubject := lReceive;
+pMessage := lMessageBL.load;
+ELSIF pMessageTypeName = 'IM_MESSAGE' THEN
+DBMS_AQ.DEQUEUE(
+pQueueOwner||'.'||pQueue,
+lDequeueOptions,
+lMessageProperties,
+lMessageIM,
+lMsgid);
+DBMS_LOB.READ(lmessageIM.subject,lCount,1,lReceive);
+pSubject := lReceive;
+pMessage := lMessageIM.load;
+
+
+
+END IF;
+
+
+
+-- For compatibility reasons, this "splitting" of lMessageProperties.correlation is maintained
+-- This splitting breaks external correlation IDs for one specific queue, this is a temp fix for this issue.
+IF pQueue NOT IN ('FIX_REP_Q','FIX_REQ_Q') AND INSTR(lMessageProperties.correlation,':') > 0 THEN
+pCorrelationID := SUBSTR(lMessageProperties.correlation,INSTR(lMessageProperties.correlation,':')+1);
+pEnqueuedBy := SUBSTR(lMessageProperties.correlation,1,INSTR(lMessageProperties.correlation,':')-1);
+ELSE
+pCorrelationID := lMessageProperties.correlation;
+lEnqueuerType := lMessageProperties.sender_id;
+pEnqueuedBy := lEnqueuerType.name;-- subs := sys.aq$_agent(lSender1, NULL, NULL);
+END IF;
+
+
+
+--/
+-- Exceptions must be handled by dequeuer
+--\
+/*
+EXCEPTION
+WHEN OTHERS THEN
+gErrm := SQLERRM;
+gLogReturn := Sm_Job_Logger.log_message(NULL,'Im_Aq_Pck','get_queue_message',gErrm,SQLCODE,Sm_Job_Logger.WARNING,TRUE);
+INSERT INTO bl.C1 VALUES ('DEQUEUE (CLOB): '||gErrm);COMMIT;
+*/
+END get_queue_message;

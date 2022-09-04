@@ -1,0 +1,107 @@
+CONNECTION MANAGER
+===================
+Need to add/change on all nodes.
+
+Login on server
+Switch to oracle user
+
+cd $ORACLE_HOME/network/admin
+cp cman.ora cman_current_date.ora
+vi cman.ora
+
+cd /u01/app/oracle/scripts/
+./reloadcm.sh
+
+
+(rule=(src=*)(dst=ora-tdws-a.qaoneadr.local)(srv=tdws)(act=accept)(action_list=(aut=off)(moct=0)(mct=0)(mit=0)(conn_stats=on)))
+(rule=(src=*)(dst=ora-tdws-b.qaoneadr.local)(srv=tdws)(act=accept)(action_list=(aut=off)(moct=0)(mct=0)(mit=0)(conn_stats=on)))
+
+
+sqlplus sys@(description_list=
+(description=(source_route=yes)
+(address=(protocol=tcp)(host=is-oracm1p)(port=1950))
+(address=(protocol=tcp)(host=ora-ionp-a.oneadr.net)(port=1521))
+(connect_data=(server=dedicated)(service_name=ionp)))
+(description=(source_route=yes)
+(address=(protocol=tcp)(host=is-oracm2p)(port=1950))
+(address=(protocol=tcp)(host=ora-ionp-b.oneadr.net)(port=1521))
+(connect_data=(server=dedicated)(service_name=ionp)))) as sysdba
+
+
+
+sqlplus sys@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-bstedkt-a.qaoneadr.local)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=ora-bstedkt-b.qaoneadr.local)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=bstedkt)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC)))) as sysdba
+
+
+sqlplus sys@(description_list=
+(description=(source_route=yes)
+(address=(protocol=tcp)(host=ap-isoracm1t)(port=1950))
+(address=(protocol=tcp)(host=ora-cfptt-a.qaoneadr.local)(port=1521))
+(connect_data=(server=dedicated)(service_name=cfptt)))
+(description=(source_route=yes)
+(address=(protocol=tcp)(host=ap-isoracm1t)(port=1950))
+(address=(protocol=tcp)(host=ora-cfptt-a.qaoneadr.local)(port=1521))
+(connect_data=(server=dedicated)(service_name=cfptt)))) as sysdba
+
+sqlplus sys@(description_list=
+(description=(source_route=yes)
+(address=(protocol=tcp)(host=ap-isoracm2d.oneadr.net)(port=1950))
+(address=(protocol=tcp)(host=ora-cfptd-a.qaoneadr.local)(port=1521))
+(connect_data=(server=dedicated)(service_name=cfptd)))
+(description=(source_route=yes)
+(address=(protocol=tcp)(host=ap-isoracm2d.oneadr.net)(port=1950))
+(address=(protocol=tcp)(host=ora-cfptd-a.qaoneadr.local)(port=1521))
+(connect_data=(server=dedicated)(service_name=cfptd)))) as sysdba
+
+
+
+Hostname:	ap-isoracm1t.oneadr.net
+IP address:	10.96.243.113
+Port:	1950
+Connection Manager: cman-isoracm1t
+
+Hostname:	ap-isoracm2t.oneadr.net
+IP address:	10.96.136.20
+Port:	1950
+Connection Manager: cman-isoracm2t
+
+Old Test Configurations  (to be maintained but no new configurations):
+Hostname:	ap-isoracm1d.oneadr.net
+IP address:	10.96.127.105
+Port:	1950
+Connection Manager: cman_is-oracm1d
+
+Hostname:	ap-isoracm2d.oneadr.net
+IP address:	10.96.127.104
+Port:	1950
+Connection Manager: cman_is-oracm2d
+
+Hostname:	ap-isoracm3d.oneadr.net
+IP address:	10.96.127.106
+Port:	1950
+Connection Manager: cman_is-oracm3d
+
+Hostname:	ap-isoracm4d.oneadr.net
+IP address:	10.96.127.68
+Port:	1950
+Connection Manager: cman_is-oracm4d
+
+Hostname:	is-oracm1p.oneadr.net
+IP address:	10.104.127.58
+Port:	1630
+Connection Manager: cman_is-oracm1p
+
+Hostname:	is-oracm2p.oneadr.net
+IP address:	10.104.127.57
+Port:	1630
+Connection Manager: cman_is-oracm2p
+
+Hostname:	is-oracm3p.oneadr.net
+IP address:	10.104.127.59
+Port:	1630
+Connection Manager: cman_is-oracm3p
+
+Hostname:	is-oracm4p.oneadr.net
+IP address:	10.104.127.56
+Port:	1630
+Connection Manager: cman_is-oracm4p
+

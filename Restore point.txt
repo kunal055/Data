@@ -1,0 +1,290 @@
+
+
+SELECT NAME, SCN, TIME, DATABASE_INCARNATION#,
+        GUARANTEE_FLASHBACK_DATABASE,STORAGE_SIZE
+        FROM V$RESTORE_POINT;
+
+create restore point WO0000000474878_27_08 guarantee flashback database;
+
+
+set lines 120
+break on report
+ 
+compute sum of percent_space_used on report
+compute sum of percent_space_reclaimable on report
+
+
+flashback database to restore point CRQ001000233809_06_08
+ 
+ 
+select file_type
+,      percent_space_used
+,      percent_space_reclaimable
+,      number_of_files
+,      con_id
+from   v$recovery_area_usage
+order by 1
+/
+
+Restore Database-
+=======================
+SQL> alter pluggable database P_UC4_UC40_21012111_P close instances=all;
+
+Pluggable database altered.
+
+SQL> flashback pluggable database P_UC4_UC40_21012111_P to restore point CRQ001000233809_06_08;
+
+Flashback complete.
+
+SQL>
+SQL>
+SQL>
+SQL>
+SQL>
+SQL> alter pluggable database P_UC4_UC40_21012111_P open resetlogs;
+
+Pluggable database altered.
+
+
+
+
+1. Stop redo transport and redo apply
+
+a)If broker is not configured:
+
+On primary database:
+SQL> alter system set log_archive_dest_state_n='defer'; =====>>>>>replace n with the corresponding number for remote destinations
+
+On standby database:
+SQL> alter database recover managed standby database cancel;
+
+b)If broker is in place:
+
+DGMGRL> edit database chicago set state = 'TRANSPORT-OFF';
+DGMGRL> edit database boston set state = 'APPLY-OFF';
+
+2. Set GRP in standby database
+
+On standby database:
+SQL> CREATE RESTORE POINT grp_dg GUARANTEE FLASHBACK DATABASE;
+
+3. Set GRP in primary database
+
+On primary database:
+SQL> CREATE RESTORE POINT grp_dg GUARANTEE FLASHBACK DATABASE;
+
+4. Enable redo transport and redo apply
+
+a)If broker is not configured:
+
+On primary database:
+SQL> alter system set log_archive_dest_state_n='enable'; =====>>>>>replace n with the corresponding number for remote destinations
+
+On standby database:
+SQL> alter database recover managed standby database using current logfile disconnect;
+
+b)If broker is in place:
+
+DGMGRL> edit database chicago set state = 'TRANSPORT-ON';
+DGMGRL> edit database boston set state = 'APPLY-ON';
+
+ 
+
+FLASHBACK DATABASE TO GUARANTEED RESTORE POINT
+
+1. Stop redo transport and redo apply
+
+a)If broker is not configured:
+
+On primary database:
+SQL> alter system set log_archive_dest_state_n='defer'; =====>>>>>replace n with the corresponding number for remote destinations
+
+On standby database:
+SQL> alter database recover managed standby database cancel;
+
+b)If broker is in place:
+
+DGMGRL> edit database chicago set state = 'TRANSPORT-OFF';
+DGMGRL> edit database boston set state = 'APPLY-OFF';
+
+2. Shutdown Primary Database and start one instance in mount stage
+
+3. Flashback primary database to restore point
+
+On primary database:
+SQL> flashback database to RESTORE POINT grp_dg;
+SQL> alter database open resetlogs;
+
+4. Shutdown Standby database and start one instance in mount stage
+
+5. Flashback standby database
+
+On standby database:
+SQL> flashback database to RESTORE POINT grp_dg;
+
+6. Enable redo transport and redo apply
+
+a)If broker is not configured:
+
+On primary database:
+SQL> alter system set log_archive_dest_state_n='enable'; =====>>>>>replace n with the corresponding number for remote destinations
+
+On standby database:
+SQL> alter database recover managed standby database using current logfile disconnect;
+
+b)If broker is in place:
+
+DGMGRL> edit database chicago set state = 'TRANSPORT-ON';
+DGMGRL> edit database boston set state = 'APPLY-ON';
+
+7. If Active Data Guard licence is used, open read only the standby database
+
+ 
+
+DROP GUARANTEED RESTORE POINT
+
+1. Stop redo transport and redo apply
+
+a)If broker is not configured:
+
+On primary database:
+SQL> alter system set log_archive_dest_state_n='defer'; =====>>>>>replace n with the corresponding number for remote destinations
+
+On standby database:
+SQL> alter database recover managed standby database cancel;
+
+b)If broker is in place:
+
+DGMGRL> edit database chicago set state = 'TRANSPORT-OFF';
+DGMGRL> edit database boston set state = 'APPLY-OFF';
+
+2. Drop GRP in primary database
+
+On primary database:
+SQL> drop RESTORE POINT grp_dg;
+
+3. Drop GRP in standby database
+
+Ensure the standby database is in mount stage and drop GRP:
+
+SQL> drop restore point grp_dg;
+
+If Active Data Guard licence is used, open read only the standby database after dropping the GRP
+
+4. Enable redo transport and redo apply
+
+a)If broker is not configured:
+
+On primary database:
+SQL> alter system set log_archive_dest_state_n='enable'; =====>>>>>replace n with the corresponding number for remote destinations
+
+On standby database:
+SQL> alter database recover managed standby database using current logfile disconnect;
+
+b)If broker is in place:
+
+DGMGRL> edit database chicago set state = 'TRANSPORT-ON';
+DGMGRL> edit database boston set state = 'APPLY-ON';
+
+REFERENCES
+NOTE:1672977.1 - How to Create or Remove Restore Point on Standby database
+	
+ 	
+Was this document helpful?
+ 
+Yes
+No
+ 	 	 
+ 	
+Document Details
+ 
+Email link to this documentOpen document in new windowPrintable Page
+	
+Type:
+Status:
+Last Major Update:
+Last Update:
+HOWTO
+PUBLISHED
+Sep 30, 2019
+Apr 3, 2020
+
+ 	 	 
+
+ 	
+Related Products
+ 
+	
+Oracle Database - Enterprise Edition
+Gen 1 Exadata Cloud at Customer (Oracle Exadata Database Cloud Machine)
+Oracle Cloud Infrastructure - Database Service
+Oracle Database Exadata Express Cloud Service
+Oracle Database Cloud Exadata Service
+Show More
+ 	 	 
+ 	
+Information Centers
+ 
+			
+19c Database Self-Guided Upgrade with Best Practices [1919.2]
+
+Information Center: Transportable Tablespaces (TTS) for Oracle Database [1461278.2]
+
+Index of Oracle Database Information Centers [1568043.2]
+
+インフォメーション・センター: データベースおよび Enterprise Manager 日本語ドキュメント [1946305.2]
+
+Information Center: Data Warehousing [1487754.2]
+
+Show More
+ 	 	 
+ 	
+Document References
+ 
+			
+How to Create or Remove Restore Point on Standby database [1672977.1]
+
+ 	 	 
+ 	
+Recently Viewed
+ 
+	ORA-00700: Soft Internal Error, Arguments: [kjctssrp: SYNCREQ Didn''t Matach], [0], [105997441], [0], [2748427.1]	
+
+	Communication Issues ORA-16525 and ORA-12545 After Succesful STANDBY Creation by EM [964252.1]	
+
+	Data Guard Standby Database Broker Configuration error DGM-17016: failed to retrieve status for database [1631552.1]	
+
+	ORA-16664 ORA-16792 Data guard Broker [1228797.1]	
+
+	New Broker Configuration Fails with DGM-17016 ORA-16664 and ORA-16883 [2466824.1]	
+
+Show More
+ 	 	 
+Didn't find what you are looking for?Ask in Community...
+
+ 
+Related
+ 
+ 
+Products
+ 
+Oracle Database Products > Oracle Database Suite > Oracle Database > Oracle Database - Enterprise Edition > Oracle Data Guard > All Physical Standby Issues
+Oracle Cloud > Oracle Infrastructure Cloud > Oracle Cloud at Customer > Gen 1 Exadata Cloud at Customer (Oracle Exadata Database Cloud Machine)
+Oracle Cloud > Oracle Platform Cloud > Oracle Cloud Infrastructure - Database Service > Oracle Cloud Infrastructure - Database Service
+Oracle Cloud > Oracle Platform Cloud > Oracle Database Cloud Service > Oracle Database Exadata Express Cloud Service
+Oracle Cloud > Oracle Platform Cloud > Oracle Database Cloud Exadata Service > Oracle Database Cloud Exadata Service
+Oracle Cloud > Oracle Platform Cloud > Oracle Database Cloud Service > Oracle Database Cloud Schema Service
+Oracle Cloud > Oracle Platform Cloud > Oracle Database Backup Service > Oracle Database Backup Service
+Oracle Cloud > Oracle Platform Cloud > Oracle Database Cloud Service > Oracle Database Cloud Service
+ 
+Keywords
+ 
+CONFIGURATION;DATA GUARD;FLASHBACK;PRIMARY;STANDBY
+
+Back to TopBack to Top
+ 
+Copyright (c) 2022, Oracle. All rights reserved.
+	 	
+Legal Notices and Terms of Use
+ 	
+Privacy Statement

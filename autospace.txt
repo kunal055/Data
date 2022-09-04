@@ -1,0 +1,46 @@
+AUTOSPACE :
+------------
+
+/me01/oracle/dbadmin/spacecheck/ 
+
+/me01/drift/log/ ---- LOG location. 
+
+ INC000002262536
+
+nohup /me01/oracle/dbadmin/spacecheck/autospace_remote.sh bct1p &
+
+CALYPP
+
+
+nohup /me01/oracle/dbadmin/audit/auditcleanupwrapper.sh bct1p & (script)
+/me01/oracle/dbadmin/audit/log (log loaction)
+
+DATABASE LEVEL : AUD$
+------------------------------
+nohup /me01/oracle/dbadmin/audit/auditcleanup.ksh nxccr2p &
+/me01/oracle/dbadmin/audit/log
+
+ 
+cd ../drift/log
+
+OS LEVEL
+-----------------------
+nohup /me01/oracle/dbadmin/cleanup/aud_cleanup.sh & audit  tail  file 
+/me01/oracle/dbadmin/cleanup/log
+ 
+
+
+nohup /me01/oracle/dbadmin/cleanup/aud_cleanup.sh &
+
+
+ALTER USER AIS_PROFILES QUOTA 100M ON USERS;
+ 
+GRANT UNLIMITED TABLESPACE TO AIS_PROFILES;
+
+
+EXEC UTL_RECOMP.recomp_serial('ALFASPI');
+
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'DISK';
+
+
+delete noprompt force archivelog until sequence=1000;

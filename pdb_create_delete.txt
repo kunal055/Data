@@ -1,0 +1,67 @@
+nddbctl create pdb \
+--pdbFreeName GSIPA \
+--pdbApplicationCode GSIP \
+--pdbEnvironment T \
+--databaseUniqueName s0441t1h \
+--useSGAMemory 16gb \
+--useCpuCount 2 \
+--useStorageCapacity 4tb \
+--useStorageIops 40000iops \
+--useStorageBandwidth 1gbps \
+--pdbPrimaryServicename gsipat \
+--pdbStandbyServicename gsipat_ro \
+--useNodes 1
+
+GSIPAT
+gsipat
+apsoa2s ,apsoa2t ,apsoa2d, apsoa2p
+
+nddbctl delete pdb --databaseUniqueName h0345d1h --pdbName P_APSOA_AP_21081008_S
+nddbctl delete pdb --databaseUniqueName s0441t1h --pdbName P_APSOA_AP_21081008_T
+nddbctl delete pdb --databaseUniqueName b0150d1h --pdbName P_APSOA_AP_21081008_D
+nddbctl delete pdb --databaseUniqueName b5222p1h --pdbName P_APSOA_AP_21081008_P
+
+
+P_NIOR_NIOR_18120313_S
+nddbctl create pdb \
+--pdbFreeName tipv \
+--pdbApplicationCode otc \
+--pdbEnvironment d \
+--databaseUniqueName h0052d1h \
+--useSGAMemory 16gb \
+--useCpuCount 2 \
+--useStorageCapacity 4tb \
+--useStorageIops 40000iops \
+--useStorageBandwidth 1gbps \
+--useNodes 1 \
+--pdbPlugFile /clustershare/pdb_seeds/seed_we8iso8859p1_122010.pdb \
+--nlsLengthSemantics byte
+
+DECLARE
+  P_PROFILE VARCHAR2(200);
+  P_PDBNAME VARCHAR2(128);
+BEGIN
+  P_PDBNAME := '<NAME OF NEW PDB>;
+  P_PROFILE := 'memory_256_gb';
+  c##nordeasystem.PROFILE.SET_PDB_PROFILE(
+    p_pdb_name => P_PDBNAME,
+    P_PROFILE => P_PROFILE
+  );
+/
+
+DECLARE
+  P_PROFILE VARCHAR2(200);
+  P_PDBNAME VARCHAR2(128);
+BEGIN
+  P_PDBNAME := '<NAME OF NEW PDB>;
+  P_PROFILE := 'cpu_64';
+  c##nordeasystem.PROFILE.SET_PDB_PROFILE(
+    p_pdb_name => P_PDBNAME,
+    P_PROFILE => P_PROFILE
+  );
+/
+
+srvctl modify database -d f3031t1h -o /u01/app/oracle/product/19.11.0.0/db210420b
+
+ nddbctl delete pdb --databaseUniqueName f3023t1o --pdbName P_GSIPOND_GSIP_21063009_T
+

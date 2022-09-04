@@ -1,0 +1,141 @@
+Oracle 19c - Complete Checklist for Manual Upgrades to Non-CDB Oracle Database 19c (Doc ID 2539778.1)
+
+19c Database Self-Guided Upgrade with Best Practices ( Doc ID 1919.2 )
+AutoUpgrade Tool ( Doc ID 2485457.1 )
+Oracle 19c - Complete checklist for Manual Upgrade for upgrading Oracle 12.x, 18c Container database (CDB) to Oracle 19c (19.x) ( Doc ID 2549866.1 )
+
+Pre-
+EXECUTE DBMS_STATS.GATHER_DICTIONARY_STATS;
+
+to see how db's are running on the same home
+
+srvctl status home -oraclehome /u01/app/oracle/product/19.10.0.0/db210119a -statefile /tmp/test.txt -node db-s008hh01d
+
+ Clearing of records from SYS.AUD$ table.
+
+ SELECT COUNT(*) FROM aud$;
+ select count(*) from unified_audit_trail;
+
+BEGIN
+DBMS_AUDIT_MGMT.CLEAN_AUDIT_TRAIL(
+AUDIT_TRAIL_TYPE => DBMS_AUDIT_MGMT.AUDIT_TRAIL_UNIFIED,
+USE_LAST_ARCH_TIMESTAMP => FALSE,
+CONTAINER => dbms_audit_mgmt.container_current);
+END;
+/
+
+select count(*) from dba_recyclebin;
+
+select owner,OBJECT_NAME,ORIGINAL_NAME,DROPTIME,CAN_UNDROP from dba_recyclebin;
+
+
+mkdir -p /home/oracle/preupgrade
+
+/u01/app/oracle/product/12.2.0.1/db180717d/jdk/bin/java -jar /u01/app/oracle/product/19.14.0.0/db202201a/rdbms/admin/preupgrade.jar FILE DIR /home/oracle/preupgrade
+=======================================================================================================
+create restore point pre_upgrade guarantee flashback database;   -------------most imp
+
+Log into the database and execute the preupgrade fixups
+@/home/oracle/preupgrade/preupgrade_fixups.sql
+@$ORACLE_HOME/rdbms/admin/utlrp.sql
+
+alter session set container=P_GPEGOQ_GORM_19040912_D;
+
+@/home/oracle/preupgrade/preupgrade_fixups.sql
+@$ORACLE_HOME/rdbms/admin/utlrp.sql
+create restore point pre_upgrade guarantee flashback database;
+select name,open_mode,log_mode from v$database;
+
+Purge the recyclebin
+PURGE DBA_RECYCLEBIN;
+=====================================on Downtime start===========================================================
+copy pfile in new home before start upgrade
+
+create pfile='/home/oracle/upgrade.ora' from spfile;
+
+alter system set cluster_database=FALSE scope=spfile sid='*';
+
+shutdown
+
+export ORACLE_SID=b0163d1o
+export ORACLE_HOME=/u01/app/oracle/product/19.10.0.0/db210119a
+export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin:/opt/puppet/bin:/home/sopsetup/.local/bin:/home/sopsetup/bin:/home/sopsetup/.local/bin:/home/sopsetup/bin:/u01/app/oracle/product/19.14.0.0/db202201a/bin:/u01/app/oracle/product/19.14.0.0/db202201a/OPatch
+
+ 
+
+sqlplus "/as sysdba"
+startup upgrade   pfile='/home/oracle/upgrade.ora'                     
+show pdbs     
+alter pluggable database P_GPEGOQ_GORM_19040912_D  open upgrade; 
+alter pluggable database all open upgrade;   
+
+cd $ORACLE_HOME/rdbms/admin
+
+dbupgrade -d $ORACLE_HOME/rdbms/admin
+
+or
+
+dbupgrade -l /<path_for_upgrade_logs>/
+
+ catupgrade logs will be generated separately for Seed database and each PDB.
+
+Note: The catuppst.sql script is run as part of the upgrade process unless the upgrade returns errors during the process. Check the log file for "BEGIN catuppst.sql" to verify that catuppst.sql ran during the upgrade process.
+
+Review the upg_summary.log to confirm that the upgrade was successful, and if necessary, review other logs.
+
+=====================================upgrade start==============================================
+$ORACLE_HOME/bin/dbupgrade
+
+select name,open_mode,cdb,version,status from v$database,v$instance;
+
+@?/rdbms/admin/utlrp.sql
+
+cd $ORACLE_HOME/rdbms/admin/
+
+ls -ltr utltz_countstats.sql utltz_countstar.sql utltz_upg_check.sql utltz_upg_apply.sql
+
+SELECT version FROM v$timezone_file;
+
+@$ORACLE_HOME/rdbms/admin/utltz_upg_check.sql
+@$ORACLE_HOME/rdbms/admin/utltz_upg_apply.sql
+select * from DBA_REGISTRY
+
+
+SET PAUSE ON
+SET PAGESIZE 60
+SET LINESIZE 300
+SET VERIFY OFF
+ 
+COL comp_name FOR a44 HEA 'Component' 
+COL version FOR a17 HEA 'Version' 
+COL status FOR a17 HEA 'Status' 
+ 
+SELECT comp_name, version, status FROM dba_registry;
+
+srvctl upgrade database -d b0163d1o -o /u01/app/oracle/product/19.10.0.0/db210119a
+
+srvctl upgrade database -d h0095d1o -o /u01/app/oracle/product/19.14.0.0/db202201a
+ 
+Postupgrade fixups --- finial steps
+========================================================================================
+
+=== for PDBS
+
+show pdbs     
+alter pluggable database P_GPEGOQ_GORM_19040912_D  open upgrade;    
+
+###############optinal 
+cd $ORACLE_HOME/rdbms/admin
+$ORACLE_HOME/perl/bin/perl catctl.pl -c P_GPEGOQ_GORM_19040912_D $ORACLE_HOME/rdbms/admin/catupgrd.sql
+
+
+
+for standby home upgrade
+
+/u01/app/oracle/product/19.10.0.0/db210119a/bin/srvctl upgrade database -db b0163d1o -o /u01/app/oracle/product/19.10.0.0/db210119a
+
+srvctl start database -d b0163d1o - o mount
+
+than start recovery 
+
+alter database recover managed standby database using current logfile disconnect from session;

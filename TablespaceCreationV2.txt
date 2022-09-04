@@ -1,0 +1,108 @@
+SET SERVEROUTPUT ON;
+
+SET LINES 2000 PAGES 2000;
+
+DECLARE
+    l_sizemb            INTEGER;
+    l_cnt               REAL;
+    l_i                 INTEGER;
+    l_j                 INTEGER;
+    l_tablespace_name   dba_data_files.tablespace_name%type;
+    CURSOR cabc IS
+        SELECT
+            ( SUM(bytes) / 1024 / 1024 ) + ( SUM(bytes) *.20 ) / 1024 / 1024 AS mb,
+            a.tablespace_name
+        FROM
+            dba_data_files a
+        WHERE (
+                a.tablespace_name NOT IN (
+                    'SYSAUX','SYSTEM','USERS'
+                )
+            AND
+                a.tablespace_name NOT LIKE 'UNDOTBS%'
+        ) GROUP BY
+            a.tablespace_name
+        ORDER BY 2;
+
+BEGIN
+    OPEN cabc;
+    LOOP
+        FETCH cabc INTO l_sizemb,l_tablespace_name;
+        EXIT WHEN
+            cabc%notfound;
+        l_cnt := l_sizemb / 1024;
+        IF l_cnt <= 10 THEN
+            dbms_output.put_line(
+                ' create tablespace '
+                 ||  l_tablespace_name
+                 ||  ' DATAFILE '
+                 ||  ''''
+                 ||  '+DATAC1'
+                 ||  ''''
+                 ||  ' size '
+                 ||  CASE
+                    WHEN
+                        l_sizemb < 1024
+                    THEN
+                        '1G autoextend on maxsize 30g;'
+                    ELSE ceil(l_sizemb / 1024)
+                     ||  'G autoextend on maxsize 30g;'
+                END
+            );
+        ELSIF ( l_cnt > 10 ) THEN
+            l_i := floor(l_cnt / 10);
+            l_j := l_i;
+            dbms_output.put_line(
+                'create tablespace '
+                 ||  l_tablespace_name
+                 ||  ' DATAFILE '
+                 ||  ''''
+                 ||  '+DATAC1'
+                 ||  ''''
+                 ||  ' size '
+                 ||  '10'
+                 ||  'G autoextend on maxsize 30g;'
+            );
+
+            l_i := l_i - 1;
+            WHILE l_i >= 1 LOOP
+                dbms_output.put_line(
+                    '  '
+                     ||  'Alter tablespace '
+                     ||  l_tablespace_name
+                     ||  ' ADD DATAFILE '
+                     ||  ''''
+                     ||  '+DATAC1'
+                     ||  ''''
+                     ||  ' size '
+                     ||  '10'
+                     ||  'G autoextend on maxsize 30g;'
+                );
+
+                l_i := l_i - 1;
+            END LOOP;
+
+            IF ( l_i = 0 AND l_sizemb - l_j * 10 * 1024 <> 0 ) THEN
+                dbms_output.put_line(
+                    '  '
+                     ||  '   Alter tablespace '
+                     ||  l_tablespace_name
+                     ||  ' ADD DATAFILE '
+                     ||  ''''
+                     ||  '+DATAC1'
+                     ||  ''''
+                     ||  ' size '
+                     ||  (ceil(
+                        (l_sizemb - l_j * 10 * 1024) / 1024
+                    ) )
+                     ||  'G autoextend on maxsize 30g;'
+                );
+            END IF;
+
+        END IF;
+
+    END LOOP;
+
+    CLOSE cabc;
+END;
+/

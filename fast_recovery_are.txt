@@ -1,0 +1,79 @@
+col name format a7
+clear breaks
+clear computes
+ 
+select name
+,      round(space_limit / 1024 / 1024) space_limit_mb
+,      round(space_used  / 1024 / 1024) space_used_mb
+,      percent_space_used
+,      percent_space_reclaimable
+,      percent_space_not_reclaimable
+from v$recovery_file_dest
+,    ( select sum(percent_space_reclaimable)                      percent_space_reclaimable
+       ,      sum(percent_space_used)                             percent_space_used
+       ,      sum(percent_space_used - percent_space_reclaimable) percent_space_not_reclaimable
+       from  v$recovery_area_usage)
+order by name
+/
+
+
+set lines 120
+break on report
+ 
+compute sum of percent_space_used on report
+compute sum of percent_space_reclaimable on report
+ 
+ 
+select file_type
+,      percent_space_used
+,      percent_space_reclaimable
+,      number_of_files
+,      con_id
+from   v$recovery_area_usage
+order by 1
+/
+
+
+
+
+col name format a7
+clear breaks
+clear computes 
+ 
+select name
+,      round(space_limit / 1024 / 1024) size_mb
+,      round(space_used  / 1024 / 1024) used_mb
+,      decode(nvl(space_used,0),0,0,round((space_used/space_limit) * 100)) pct_used
+from v$recovery_file_dest
+order by name
+/
+
+
+
+
+col name format a7
+clear breaks
+clear computes
+ 
+select name
+,      round(space_limit / 1024 / 1024) space_limit_mb
+,      round(space_used  / 1024 / 1024) space_used_mb
+,      percent_space_used
+,      percent_space_reclaimable
+,      percent_space_not_reclaimable
+from v$recovery_file_dest
+,    ( select sum(percent_space_reclaimable)                      percent_space_reclaimable
+       ,      sum(percent_space_used)                             percent_space_used
+       ,      sum(percent_space_used - percent_space_reclaimable) percent_space_not_reclaimable
+       from  v$recovery_area_usage)
+order by name
+/
+
+
+NAME    SPACE_LIMIT_MB SPACE_USED_MB PERCENT_SPACE_USED PERCENT_SPACE_RECLAIMABLE PERCENT_SPACE_NOT_RECLAIMABLE
+------- -------------- ------------- ------------------ ------------------------- -----------------------------
++RECO          1201138        958099              79.77                     61.91                         17.86
+
+
+
+----------------------------------------------------------------------------------------------------------------

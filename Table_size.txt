@@ -1,0 +1,7 @@
+heck table size from dba_segments ---------------
+
+select segment_name,sum(bytes)/1024/1024/1024 GB from dba_segments where segment_type='TABLE' and segment_name=upper('&TABLE_NAME') group by segment_name; 
+
+To check the size of partition table in Oracle---
+
+select PARTITION_NAME,sum(bytes)/1024/1024/1024 GB from dba_segments where SEGMENT_NAME=upper('&TABLE_NAME') and PARTITION_NAME='P01' group by PARTITION_NAME;

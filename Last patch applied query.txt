@@ -1,0 +1,5 @@
+col VERSION for a15;
+col COMMENTS for a50; 
+col ACTION for a10; 
+set lines 500;
+select ACTION,VERSION,COMMENTS,BUNDLE_SERIES from registry$history;

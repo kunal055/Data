@@ -1,0 +1,232 @@
+Active sessions-
+
+Set echo off
+set pagesize 1000
+set lines 200
+set verify off
+set heading on
+set feedback on
+col SESS format a12
+col status format a10
+col SQL_ID format a20
+col program format a30
+col terminal format a12
+col "Machine Name" format a15
+col "DB User" format a14
+col "Logon Time" format a14
+col "OS User" format a10
+col EVENT format a35
+col MACHINE format a20
+col SQL_ID format a15
+select inst_id,rpad(s.username,14,' ') as "DB User",
+to_char(logon_time,'hh24:mi Mon/dd') as "Logon Time",
+s.sid||','||s.serial# SESS,
+rpad(upper(substr(s.program,instr(s.program,'\',-1)+1)),30,' ') as "Program",
+rpad(lower(osuser),10,' ') as "OS User",MACHINE,
+round(LAST_CALL_ET/60) MINS_ACTIVE,SQL_ID,EVENT
+from gv$session s
+where s.status='ACTIVE' and username not in ('SYS','DBSNMP','PUBLIC','SYSTEM')
+-- order by SQL_ID,LAST_CALL_ET
+order by SQL_ID
+/
+
+Locking objects-
+
+catblock.sql
+
+utllockt.sql
+
+TTFBO_REPT_LEAN_BOARD_DET
+
+select
+   session_id
+from
+   dba_dml_locks
+where
+   name = 'TTFBO_REPT_LEAN_BOARD_DET' owner='TFBOAC';
+
+SELECT O.OBJECT_NAME, S.SID, S.SERIAL#, P.SPID, S.PROGRAM,S.USERNAME,
+S.MACHINE,S.PORT , S.LOGON_TIME,SQ.SQL_FULLTEXT 
+FROM V$LOCKED_OBJECT L, DBA_OBJECTS O, V$SESSION S, 
+V$PROCESS P, V$SQL SQ 
+WHERE L.OBJECT_ID = O.OBJECT_ID 
+AND L.SESSION_ID = S.SID AND S.PADDR = P.ADDR 
+AND S.SQL_ADDRESS = SQ.ADDRESS;
+
+select lo.session_id,lo.oracle_username,lo.os_user_name,
+lo.process,do.object_name,
+decode(lo.locked_mode,0, 'None',1, 'Null',2, 'Row Share (SS)',
+3, 'Row Excl (SX)',4, 'Share',5, 'Share Row Excl (SSX)',6, 'Exclusive',
+to_char(lo.locked_mode)) mode_held
+from v$locked_object lo, dba_objects do
+where lo.object_id = do.object_id
+order by 1,5
+/
+
+Long running query-
+
+select sid,inst_id,opname,totalwork,sofar,start_time,time_remaining
+from gv$session_longops
+where totalwork<>sofar
+/
+
+Blocking session-
+
+select
+   blocking_session,
+   sid,
+   serial#,
+   wait_class,
+   seconds_in_wait
+from
+   v$session
+where
+   blocking_session is not NULL
+order by
+   blocking_session;
+
+
+select
+   sid,
+   serial#
+from
+   v$session
+where
+   sid in (
+   select
+      session_id
+   from
+      dba_dml_locks
+   where
+      name = 'UC4ADMIN');
+
+
+select snap_id,sql_id,plan_hash_value from dba_hist_sqlstat where sql_id='62agcsp352j07'
+
+
+select s.sid, s.username, s.program, i.block_changes,s.sql_id FROM v$session s, v$sess_io i WHERE i.block_changes!=0 and s.sid = i.sid ORDER BY 4 desc, 1,2,3;
+
+select SQL_FULLTEXT from v$sql where SQL_ID='&sql_id';
+
+
+select sql_id,child_number,plan_hash_value from gv$sql where sql_id='gsz46hpca8ak8';
+
+
+SELECT * from TABLE(DBMS_XPLAN.DISPLAY_CURSOR('&sqlid',&child_number));
+
+
+select * from table(dbms_xplan.display_awr(sql_id => '&SQL_ID'));
+
+
+
+select stale_stats
+from dba_tab_statistics
+where owner = 'SYS'
+  and table_name = 'ORA_TEMP_1_DS_607055'
+
+
+select TABLE_NAME,LAST_ANALYZED,STALE_STATS from dba_tab_statistics where table_name = 'GS_TRADE_BOOK_ATTRIBUTE' and owner='GLOSTATIC';
+
+
+select count(*) from DMART_TDW.FACT_SIMREP_POS_DETAILS
+
+
+SQL_FULLTEXT
+--------------------------------------------------------------------------------
+insert /*+ append */ into sys.ora_temp_1_ds_607055 SELECT /*+ no_parallel(t) no
+
+
+ps -ef| grep pid
+
+SID and Serial from from pid------
+
+select sid,serial# from v$session where paddr=(select addr from v$process where spid=&spid);
+
+
+sqlid from sid----
+
+set lines 200
+
+col username for a14 col event for a30
+
+select sid,serial#,username,sql_id,status,state,logon_time,last_call_et/60 "min",state,event,p1 from v$session where sid=&sid;
+
+
+set lines 200
+
+select sql_id,child_number,sql_text from v$sql where sql_id='&sql_id' order by child_number;
+
+
+
+select a.sid, a.serial# from v$session a, v$locked_object b, dba_objects c where b.object_id = c.object_id and a.sid = b.session_id and OBJECT_NAME='TFBOAC';
+
+select SQL_FULLTEXT from v$sql where SQL_ID='&sql_id';
+
+
+
+fhufchw9ju3x3
+
+62agcsp352j07
+
+
+
+DECLARE
+l_sql_tune_task_id VARCHAR2(100);
+BEGIN
+l_sql_tune_task_id := DBMS_SQLTUNE.create_tuning_task (
+sql_id => '67hcqykgbvhmh',
+scope => DBMS_SQLTUNE.scope_comprehensive,
+time_limit => 500,
+task_name => '67hcqykgbvhmh_tuning_task12',
+description => 'Tuning task1 for statement 67hcqykgbvhmh');
+DBMS_OUTPUT.put_line('l_sql_tune_task_id: ' || l_sql_tune_task_id);
+END;
+/
+
+
+EXEC DBMS_SQLTUNE.execute_tuning_task(task_name => '67hcqykgbvhmh_tuning_task12');
+
+
+set long 65536
+set longchunksize 65536
+set linesize 100
+select dbms_sqltune.report_tuning_task('67hcqykgbvhmh_tuning_task12') from dual;
+
+f4mbkpnrmduyf
+
+execute dbms_sqltune.accept_sql_profile(task_name =>'62agcsp352j07_tuning_task12', task_owner => 'SYS', replace =>TRUE);
+
+ execute dbms_stats.gather_table_stats(ownname => 'TGL', tabname =>'CAL_PROXY_TEMP', estimate_percent =>DBMS_STATS.AUTO_SAMPLE_SIZE, method_opt => 'FOR ALL COLUMNS SIZE AUTO');
+
+execute dbms_stats.gather_table_stats(ownname => 'GLOSTATIC', tabname =>'GS_TRADE_BOOK_ATTRIBUTE', estimate_percent =>DBMS_STATS.AUTO_SAMPLE_SIZE, method_opt => 'FOR ALL COLUMNS SIZE AUTO');
+
+
+
+exec DBMS_STATS.GATHER_TABLE_STATS (ownname => 'MARSP' , tabname => 'RISK_INTEREST_PRODUCT',cascade => true, estimate_percent => 10,method_opt=>'for all indexed columns size 1', granularity => 'ALL', degree => 4);
+
+
+exec dbms_stats.unlock_table_stats('MARSP', 'RISK_INTEREST_PRODUCT');
+
+
+exec dbms_stats.lock_table_stats('MARSP', 'RISK_INTEREST_PRODUCT');
+
+select
+   table_name,
+   index_name,
+   column_name
+from
+   dba_ind_columns
+where
+   table_owner='TFBOIX' and table_name='IXQDBWEV'
+order by
+   table_name,
+   column_position;
+
+wait event-
+
+SELECT NVL(a.event, 'ON CPU') AS event,
+       COUNT(*) AS total_wait_time
+FROM   v$active_session_history a
+WHERE  a.sample_time > SYSDATE - 5/(24*60) -- 5 mins
+GROUP BY a.event
+ORDER BY total_wait_time DESC;

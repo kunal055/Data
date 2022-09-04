@@ -1,0 +1,61 @@
+srvctl add service -s rman_b5380p1o -d b5380p1o -preferred b5380p1o3
+
+srvctl add service -s whatep_ro -d b5382p1o -preferred b5382p1o3
+srvctl add service -s whatep -d b5382p1o -preferred b5382p1o3
+
+srvctl add service -s s_whatep_wh_21101519_p -d b5382p1o -preferred b5377p1o3
+
+srvctl add service -s gobirrt -d h0650d1o -preferred h0650d1o1,h0650d1o4 -pdb P_GOBIRR_GSIP_21110312_T
+
+
+
+
+
+
+srvctl config service -d h0650d1o -s gobirrt_ro
+On primary-
+
+srvctl add service -s s_dacs2_trmd_21020514_p -d b5430p1h  -preferred b5430p1h1 -pdb P_DACS2_TRMD_21020514_P
+
+srvctl add service -s cdp7oep_ro -d h0650d1h -preferred h0650d1h1 -pdb P_GOBIRR_GSIP_21110312_T(first start service on primary and switch logfile then stop service on primary and addro service on standby)
+
+srvctl add service -s whatep -d b5382p1h -preferred b5382p1h3  -pdb P_GOBIRR_GSIP_21110312_T
+srvctl add service -s rman_b5380p1h -d b5380p1h -preferred b5380p1h3 -pdb P_GOBIRR_GSIP_21110312_T
+
+
+Standby-
+
+srvctl add service -s cdp7oep_ro -d h5091p1o -preferred h5091p1o1 -pdb P_CDP7OE_CDP_22011508_P -role PHYSICAL_STANDBY
++S009HHD_DATA/H0451D1H/PASSWORD/pwdh0451d1h.6011.1090921935 -> /tmp/pwdh0451d1h.6011.1090921935
+
+
+db-s005oep-scan.oneadr.net
+
+
+cd $ORACLE_HOME/OPatch
+datapatch -verbose -apply 31668882/23790068 -force -pdbs PDB$SEED
+
+set linesize 150
+col name for a15
+col cause for a15
+col message for a50
+
+ 
+
+select name, cause, type, message, status from pdb_plug_in_violations where type = 'ERROR' and status != 'RESOLVED'  order by name, time;
+
+create table registry$sqlpatch_org_bkp__APR as select * from registry$sqlpatch;
+
+ALTER TABLESPACE TEMP ADD TEMPFILE '+S011HHP_DATA' SIZE 10G AUTOEXTEND ON;
+
+
+ 
+
+
+exec dbms_pdb.exec_as_oracle_script('drop table registry$sqlpatch');
+
+ 
+
+@$ORACLE_HOME/rdbms/admin/catsqlreg.sql
+
+

@@ -1,0 +1,9 @@
+select 'alter database datafile '|| file_name|| ' '|| ' autoextend on maxsize unlimited;' from dba_data_files where autoextensible='NO';
+
+
+select FILE_NAME, BYTES/power(1024,3) BytesInGB, increment_by INCREMENT_BY_BLOCKS,(increment_by*8192)/power(1024,2) IncrementByInMB from dba_data_files
+
+
+
+
+alter database datafile '+S011OEP_DATA/B5412P1O/DATAFILE/users.5479.1096125803' autoextend on next 1g maxsize unlimited;

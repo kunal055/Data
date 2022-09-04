@@ -1,0 +1,150 @@
+SET SERVEROUTPUT ON SIZE 1000000
+set echo off
+set feedback off
+set verify off
+
+
+declare
+Inusername varchar2(30) default '&User_Name';
+reccount number(10) default 0;
+recdata varchar2(1000) default NULL;
+tmpstr varchar2(100) default null;
+cursor USERINFO is
+Select * from sys.dba_users where username = upper(Inusername);
+
+USERREC USERINFO%rowtype;
+
+CURSOR ROLEINFO IS
+Select * from sys.dba_role_privs WHERE grantee = upper(Inusername);
+
+ROLEREC ROLEINFO%rowtype; 
+
+CURSOR SYSPRIVINFO IS
+Select * from sys.dba_sys_privs WHERE grantee = upper(Inusername);
+
+SYSPRIVREC SYSPRIVINFO%rowtype; 
+
+CURSOR OBJPRIVINFO IS
+Select o.object_type, pp.*
+from sys.dba_objects o,
+     (Select p.grantee, p.owner, p.table_name, null column_name, p.privilege, p.grantable
+     from sys.dba_tab_privs p
+     where p.grantee = upper(Inusername)
+     UNION
+     Select p.grantee, p.owner, p.table_name, p.column_name, p.privilege, p.grantable
+     from sys.dba_col_privs p
+where p.grantee = upper(Inusername)) pp
+where o.OWNER = pp.owner
+and o.object_name = pp.table_name and o.object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'PROCEDURE', 'FUNCTION', 'SNAPSHOT', 
+'MATERIALIZED VIEW', 'DIRECTORY', 'LIBRARY', 'TYPE', 'OPERATOR', 'INDEXTYPE');
+
+OBJPRIVREC OBJPRIVINFO%rowtype; 
+
+begin
+     reccount:=0;
+     recdata:='';
+----- Start User Creation Script
+     OPEN USERINFO;
+     fetch USERINFO INTO USERREC;
+     WHILE USERINFO%found LOOP
+          RECCOUNT:=RECCOUNT+1;
+          IF RECCOUNT=1 THEN
+               DBMS_OUTPUT.PUT_LINE('---------------------------------------------------');
+               DBMS_OUTPUT.PUT_LINE('----------- '||Inusername||' User Creation Script -----------');
+               DBMS_OUTPUT.PUT_LINE('---------------------------------------------------');
+          end if;
+          DBMS_OUTPUT.PUT_LINE('CREATE USER '||USERREC.USERNAME);
+          DBMS_OUTPUT.PUT_LINE('IDENTIFIED BY VALUES '||''''||USERREC.PASSWORD||'''');
+          DBMS_OUTPUT.PUT_LINE('DEFAULT TABLESPACE '||USERREC.DEFAULT_TABLESPACE);
+          DBMS_OUTPUT.PUT_LINE('TEMPORARY TABLESPACE '||USERREC.TEMPORARY_TABLESPACE);
+          DBMS_OUTPUT.PUT_LINE('PROFILE '||USERREC.PROFILE);
+          IF USERREC.ACCOUNT_STATUS='OPEN' THEN
+               DBMS_OUTPUT.PUT_LINE('ACCOUNT '||'UNLOCK;');
+          ELSE
+               IF USERREC.ACCOUNT_STATUS LIKE '%EXPIRED%' THEN
+                    DBMS_OUTPUT.PUT_LINE('PASSWORD EXPIRE');
+                    DBMS_OUTPUT.PUT_LINE('ACCOUNT '||'LOCK;');
+               ELSE
+                    DBMS_OUTPUT.PUT_LINE('ACCOUNT '||'LOCK;');
+               END IF;
+          END IF;
+     FETCH USERINFO INTO USERREC;
+     END LOOP;
+     CLOSE USERINFO;
+     IF RECCOUNT>0 THEN
+          DBMS_OUTPUT.PUT_LINE(CHR(13));
+     END IF;
+----- End User Creation Script
+     reccount:=0;
+     recdata:='';
+----- Start User Roles Script
+     OPEN ROLEINFO;
+     fetch ROLEINFO INTO ROLEREC;
+     WHILE ROLEINFO%found LOOP
+          if ROLEREC.DEFAULT_ROLE='YES' THEN
+               RECCOUNT:=RECCOUNT+1;
+          ELSE
+               RECCOUNT:=RECCOUNT+1;
+               IF RECDATA IS NULL THEN
+                    RECDATA:=RECDATA || ROLEREC.GRANTED_ROLE;
+               ELSE
+                    RECDATA:=RECDATA || ','||ROLEREC.GRANTED_ROLE;
+               END IF;
+          END IF;
+          IF ROLEREC.ADMIN_OPTION='YES' THEN
+               DBMS_OUTPUT.PUT_LINE('GRANT '||ROLEREC.GRANTED_ROLE||' TO '||ROLEREC.GRANTEE||' WITH ADMIN OPTION;');
+          ELSE
+               DBMS_OUTPUT.PUT_LINE('GRANT '||ROLEREC.GRANTED_ROLE||' TO '||ROLEREC.GRANTEE||';');
+          END IF;
+     FETCH ROLEINFO INTO ROLEREC;
+     END LOOP;
+     IF RECCOUNT<>0 THEN
+          IF RECDATA IS NULL THEN
+               DBMS_OUTPUT.PUT_LINE('ALTER USER '||Inusername||' DEFAULT ROLE ALL'||';');
+          ELSE
+               DBMS_OUTPUT.PUT_LINE('ALTER USER '||Inusername||' DEFAULT ROLE ALL EXCEPT '||RECDATA||';');
+          END IF;
+     END IF;
+     CLOSE ROLEINFO;
+     IF RECCOUNT>0 THEN
+          DBMS_OUTPUT.PUT_LINE(CHR(13));
+     END IF;
+----- End User Roles Script
+     reccount:=0;
+     recdata:='';
+----- Start User Sys Privs Script
+     OPEN SYSPRIVINFO;
+     fetch SYSPRIVINFO INTO SYSPRIVREC;
+     WHILE SYSPRIVINFO%found LOOP
+          RECCOUNT:=RECCOUNT+1;
+          DBMS_OUTPUT.PUT_LINE('GRANT '||SYSPRIVREC.PRIVILEGE||' TO '||SYSPRIVREC.GRANTEE||';');
+     FETCH SYSPRIVINFO INTO SYSPRIVREC;
+     END LOOP;
+     CLOSE SYSPRIVINFO;
+     IF RECCOUNT>0 THEN
+          DBMS_OUTPUT.PUT_LINE(CHR(13));
+     END IF;
+----- End User Sys Privs Script
+     reccount:=0;
+     recdata:='';
+----- Start User Obj Privs Script
+     OPEN OBJPRIVINFO;
+     fetch OBJPRIVINFO INTO OBJPRIVREC;
+     WHILE OBJPRIVINFO%found LOOP
+          RECCOUNT:=RECCOUNT+1;
+          IF OBJPRIVREC.GRANTABLE='YES' THEN
+               tmpstr:=' WITH GRANT OPTION;';
+          ELSE
+               tmpstr:=';';
+          END IF;
+          DBMS_OUTPUT.PUT_LINE('GRANT '||OBJPRIVREC.PRIVILEGE||' ON '||OBJPRIVREC.OWNER||'.'||OBJPRIVREC.TABLE_NAME||' TO '||OBJPRIVREC.GRANTEE||tmpstr);
+          recdata:=OBJPRIVREC.TABLE_NAME;
+     FETCH OBJPRIVINFO INTO OBJPRIVREC;
+     END LOOP;
+     CLOSE OBJPRIVINFO;
+     IF RECCOUNT>0 THEN
+          DBMS_OUTPUT.PUT_LINE(CHR(13));
+     END IF;
+----- End User Obj Privs Script
+end;
+/

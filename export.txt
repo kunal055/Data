@@ -1,0 +1,31 @@
+:wqS
+
+impdp sys@hdpt dumpfile=hpdt_full_%u.dmp logfile=imp_hdp.log directory=datapump
+
+expdp DIRECTORY=expdp DUMPFILE=hpdt_full_%u.dmp LOGFILE=hpdt_full.log FULL=Y METRICS=Y PARALLEL=4 EXCLUDE=STATISTICS
+
+datapump
+
+
+
+impdp DIRECTORY=exp030822 DUMPFILE=cbasod_full_%u.dmp LOGFILE=cbasod_full_%u.log METRICS=Y LOGTIME=ALL EXCLUDE=STATISTICS
+
+
+
+nohup expdp parfile=preprod_CRQ001000171840.par &
+
+userid=system/Town2last4ever@"(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=db-s009hhd-scan.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=hdpt)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
+dumpfile=hpdt_full_%u.dmp 
+logfile=imp_hdp.log 
+directory=datapump
+
+
+
+userid=system/Pack2last4ever@"(DESCRIPTION = (LOAD_BALANCE = OFF) (FAILOVER = ON) (CONNECT_TIMEOUT=5) (TRANSPORT_CONNECT_TIMEOUT=3) (RETRY_COUNT=3) (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = ora-ORMBLP-a.oneadr.net)(PORT = 1521)) (ADDRESS = (PROTOCOL = TCP)(HOST = ora-ORMBLP-b.oneadr.net) (PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = ORMBLP) (FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
+directory=CRQ001000200370
+dumpfile=CRQ001000200370_1.dmp
+logfile=CRQ001000200370_1.log
+full=y
+
+
+ces1s

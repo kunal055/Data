@@ -1,0 +1,54 @@
+alter flashback archive AUDIT_ARCHIVE1 purge before scn 988827;
+
+alter flashback archive AUDIT_ARCHIVE1 purge before timestamp to_timestamp('24112021 12:49:30','ddmmyyyy hh24:mi:ss');
+
+CREATE TABLESPACE fda_ts DATAFILE SIZE 1M AUTOEXTEND ON NEXT 1M;
+ALTER USER test QUOTA UNLIMITED ON fda_ts;
+
+CREATE FLASHBACK ARCHIVE DEFAULT fda_1year TABLESPACE fda_ts
+  QUOTA 10G RETENTION 1 YEAR;
+
+alter flashback archive AUDIT_ARCHIVE1 remove tablespace NORDEA_AUDIT;
+
+alter flashback archive AUDIT_ARCHIVE1 add tablespace NORDEA_AUDIT_FDA quota 15360m;
+
+SET LINESIZE 150
+
+COLUMN owner_name FORMAT A20
+COLUMN flashback_archive_name FORMAT A22
+COLUMN create_time FORMAT A20
+COLUMN last_purge_time FORMAT A20
+
+SELECT owner_name,
+       flashback_archive_name,
+       flashback_archive#,
+       retention_in_days,
+       TO_CHAR(create_time, 'DD-MON-YYYY HH24:MI:SS') AS create_time,
+       TO_CHAR(last_purge_time, 'DD-MON-YYYY HH24:MI:SS') AS last_purge_time,
+       status
+FROM   dba_flashback_archive
+ORDER BY owner_name, flashback_archive_name;
+
+OWNER_NAME           FLASHBACK_ARCHIVE_NAME FLASHBACK_ARCHIVE# RETENTION_IN_DAYS CREATE_TIME          LAST_PURGE_TIME      STATUS
+-------------------- ---------------------- ------------------ ----------------- -------------------- -------------------- -------
+SYS                  FDA_1YEAR                               1               365 06-JAN-2015 19:30:57 06-JAN-2015 19:30:57 DEFAULT
+
+SQL>
+
+
+SET LINESIZE 150
+
+COLUMN flashback_archive_name FORMAT A22
+COLUMN tablespace_name FORMAT A20
+COLUMN quota_in_mb FORMAT A11
+
+SELECT flashback_archive_name,
+       flashback_archive#,
+       tablespace_name,
+       quota_in_mb
+FROM   dba_flashback_archive_ts
+ORDER BY flashback_archive_name;
+
+FLASHBACK_ARCHIVE_NAME FLASHBACK_ARCHIVE# TABLESPACE_NAME      QUOTA_IN_MB
+---------------------- ------------------ -------------------- -----------
+FDA_1YEAR                               1 FDA_TS               10240

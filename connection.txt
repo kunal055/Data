@@ -1,0 +1,17 @@
+(DESCRIPTION = (LOAD_BALANCE = OFF) (FAILOVER = ON) (CONNECT_TIMEOUT=5) (TRANSPORT_CONNECT_TIMEOUT=3) (RETRY_COUNT=3) (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = ora-apcd-a.qaoneadr.local)(PORT = 1521)) (ADDRESS = (PROTOCOL = TCP)(HOST = ora-apcd-b.qaoneadr.local)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = apcd) (FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))
+
+sys@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-mimd-b.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=mimd_ro))) as sysdba
+
+sys@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3) (RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-mimd-.qaoneadr.local)(PORT=1521)) (ADDRESS=(PROTOCOL=TCP)(HOST=ora-mimd-b.qaoneadr.local)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=mimd_ro)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC)))) as sysdba
+
+
+
+
+ Thread Last Sequence Received Last Sequence Applied
+---------- ---------------------- ---------------------
+         2                 108260                104145 61 
+         3                 108671                104562  76
+
+PdbExaMaster2last4ever
+
+

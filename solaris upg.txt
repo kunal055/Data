@@ -1,0 +1,131 @@
+tar -cvf /export/home19_bkp.tar .
+
+
+db-tpremias-oe1
+
+
+
+/u01/app/oracle/product/11.2.0.4/db190416a
+
+
+/u01/app/oracle/product/19.3.0.0/db070422b
+
+db-tpremiad-hh1
+db-tpremiad-oe 
+
+
+
+tart -xvf home19_bkp.tar
+
+./runInstaller -clone -silent -ignorePreReq ORACLE_HOME="/u01/app/oracle/product/19.3.0.0/db070422b"
+
+
+
+./runInstaller -clone -silent -ignorePreReq ORACLE_HOME="/u01/app/oracle/product/19.3.0.0/db070422b" ORACLE_HOME_NAME="db070422b" ORACLE_BASE="/u01/app/oracle" OSDBA_GROUP=dba OSOPER_GROUP=dba
+
+
+
+/usr/bin:/usr/sbin:/usr/sbin:/usr/local/bin:/u01/app/oracle/product/19.3.0.0/db060422a/bin:/u01/app/oracle/product/19.3.0.0/db060422a/bin
+
+
+
+export PATH='/usr/bin:/usr/sbin:/usr/sbin:/usr/local/bin:/u01/app/oracle/product/19.3.0.0/db060422a/bin'
+
+
+
+./runInstaller -createGoldImage -destinationLocation /dp_pump -silent
+
+
+
+SELECT version FROM v$timezone_file;
+
+
+  export ORACLE_SID=tpremia2s
+export ORACLE_HOME=/u01/app/oracle/product/19.3.0.0/db070422b
+export PATH=/u01/app/oracle/product/19.3.0.0/db070422b:$PATH
+
+
+
+
+select name,open_mode,cdb,version,status from v$database,v$instance;
+
+db-tpremiat-hh
+
+ 
+
+@?/rdbms/admin/utlrp.sql
+
+ 
+
+cd $ORACLE_HOME/rdbms/admin/
+
+ 
+
+ls -ltr utltz_countstats.sql utltz_countstar.sql utltz_upg_check.sql utltz_upg_apply.sql
+
+ 
+
+SELECT version FROM v$timezone_file;
+
+ 
+
+@$ORACLE_HOME/rdbms/admin/utltz_upg_check.sql
+@$ORACLE_HOME/rdbms/admin/utltz_upg_apply.sql
+select * from DBA_REGISTRY
+
+cp /u01/app/oracle/product/11.2.0.4/db190416a/dbs /u01/app/oracle/product/19.3.0.0/db070422b/dbs
+
+
+1.PURGE DBA_RECYCLEBIN ;
+2.EXEC DBMS_STATS.GATHER_DICTIONARY_STATS;
+create restore point pre_upgrade guarantee flashback database;
+SELECT comp_name, version, status FROM dba_registry 
+3./u01/app/oracle/product/11.2.0.4/db190416a/jdk/bin/java -jar /u01/app/oracle/product/19.3.0.0/db070422b/rdbms/admin/preupgrade.jar FILE DIR /tmp/preupgrade/
+
+@/tmp/preupgrade/preupgrade_fixups.sql
+@/tmp/preupgrade/postupgrade_fixups.sql
+4.@/u01/preupgrade/preupgrade_fixups.sql
+5.SELECT version FROM v$timezone_file;
+6.shut immediate 11g database
+7.Copy the parameter and password file from the 11g home to the new 19c home.
+8.export ORACLE_SID=tpremia1t
+  export ORACLE_HOME='/u01/app/oracle/product/19.3.0.0/db070422b'
+  export PATH=/u01/app/oracle/product/19.3.0.0/db070422b:$PATH
+9.startup upgrade
+10. run from bin ./dbupgrade
+11.Startup database after upgrade completed.and run
+  @catuppst.sql
+@$ORACLE_HOME/rdbms/admin/utltz_upg_check.sql
+@$ORACLE_HOME/rdbms/admin/utltz_upg_apply.sql
+12.compile invalid objects
+
+
+SET SERVEROUTPUT ON
+ DECLARE
+  l_tz_version PLS_INTEGER;
+BEGIN
+  l_tz_version := DBMS_DST.get_latest_timezone_version;
+ 
+  DBMS_OUTPUT.put_line('l_tz_version=' || l_tz_version);
+  DBMS_DST.begin_upgrade(l_tz_version);
+END;
+/
+
+
+
+SET SERVEROUTPUT ON
+ DECLARE
+  l_failures   PLS_INTEGER;
+BEGIN
+  DBMS_DST.upgrade_database(l_failures);
+  DBMS_OUTPUT.put_line('DBMS_DST.upgrade_database : l_failures=' || l_failures);
+  DBMS_DST.end_upgrade(l_failures);
+  DBMS_OUTPUT.put_line('DBMS_DST.end_upgrade : l_failures=' || l_failures);
+END;
+/
+ ln -s /lme01/oracle/ora_setup/listener.ora
+
+
+ln -s /u01/app/oracle/product/19.3.0.0/db070422b lsnr_home
+unlink lsnr_home
+

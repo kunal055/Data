@@ -1,0 +1,35 @@
+SET LINES 999
+SET PAGES 300
+COL "PARAMETER" FOR A50 
+COL "IS_DEFAULT" FOR A10
+COL "SESSION" FOR A10
+COL "INSTANCE" FOR A10
+COL "IS_SYSTEM_MODIFIABLE" FOR A20
+
+SELECT a.KSPPINM "PARAMETER", 
+       b.KSPPSTDF "IS_DEFAULT",
+       b.KSPPSTVL "SESSION", 
+       c.KSPPSTVL "INSTANCE",
+       DECODE(BITAND(a.KSPPIFLG/256,1),1,'TRUE','FALSE') IS_SESSION_MODIFIABLE, 
+       DECODE(BITAND(a.KSPPIFLG/65536,3),1,'IMMEDIATE',2,'DEFERRED',3,'IMMEDIATE','FALSE') IS_SYSTEM_MODIFIABLE
+FROM   X$KSPPI  a,
+       X$KSPPCV b,
+       X$KSPPSV c
+WHERE  a.INDX = b.INDX
+AND    a.INDX = c.INDX
+AND    a.KSPPINM LIKE '/_%' escape '/'
+/
+
+SELECT x.ksppinm "Parameter",
+Y.ksppstvl "Session Value",
+ Z.ksppstvl "Instance Value"
+ FROM x$ksppi X,
+ x$ksppcv Y,
+ x$ksppsv Z
+ WHERE x.indx = Y.indx
+ AND x.indx = z.indx
+ AND x.ksppinm LIKE '/_%' escape '/'
+ AND x.ksppinm LIKE '_allow_insert_with_update_check'
+ order by x.ksppinm;
+
+SELECT db.parameter AS parameter, db.value AS database_value, s.value AS session_value, i.value AS instance_value FROM nls_database_parameters db LEFT JOIN nls_session_parameters s ON s.parameter = db.parameter LEFT JOIN nls_instance_parameters i ON i.parameter = db.parameter WHERE db.parameter = 'NLS_LENGTH_SEMANTICS';

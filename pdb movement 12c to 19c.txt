@@ -1,0 +1,107 @@
+Preq:-
+
+1.Find/Create new container on 19C.
+2.Check/Schedule backup of newly created contianer i.e Target Container .
+3.Newly created contaniner should be in OEM.
+4.Check size of the source DB ,If Db size in TB's try running PDB creation script in nohup
+
+Implementation
+
+move_pdb	(root, contains only catalogs)
+-	conf	(Contains one configuration file for the scripts)
+-	source_primary (Scripts to run from source primary)
+-	source_standby (Scripts to run from source standby)
+-	target_primary (Scripts to run from target primary)
+-	target_standby (Scripts to run from target standby)
+-	Various helper scripts
+
+1.We need to prepare scripts as per enviornment, In below script(Config File) we need to make changes
+
+[oracle@db-s009hh01d conf]$ cat move_pdb.conf
+
+CDB_SOURCE=s0312t1h--------------------------------------Source DB name
+CDB_TARGET=s0200t1h---------------------------------------Target DB name
+CDB_RUNNING_INSTANCES=s0312t1h-----------------------------Source DB running instance name
+CDB_MIGRATE_SERVICE=s0312t----------------------------------Service name use for creating DB link
+CDB_REMOTE_USER=c##clonesNDFCOMA----------------------------User name which needs to be created
+CLONE_LINK=clone_NDFCOMA_link------------------------------DB link name which needs to be created
+VIP=db-s009hh01d.qaoneadr.local----------------------------Vip of where DB is runnning
+
+PDB_SOURCE=P_NDFCOMA_DBFA_21022311_S----------------------Source PDB name
+PDB_TARGET=P_NDFCOMA_DBFA_21022311_S-----------------------Target DB name(We can change the name as well as per requirement)
+PDB_PREFERRED_INSTANCES=s0200t1h3,s0200t1h4----------------On which instances services should run
+PDB_AVAILABLE_INSTANCES=s0200t1h3,s0200t1h4-----------------On which instances services should run
+PDB_MIGRATE_SERVICE=pdb_NDFCOMA_migrate---------------------New service will be created for migration
+PDB_PRIMARY_SERVICE=ndfcomas--------------------------------Theese should be same service as running on Source DB
+PDB_STANDBY_SERVICE=ndfcomas_ro-----------------------------Theese should be same service as running on Source DB
+PDB_NODBOT_SERVICE=s_ndfcoma_dbfa_21022311_s----------------Theese should be same service as running on Source DB
+
+2.Then we have to go to source DB  source_primary (Scripts to run from source primary) and run below scripts in particular order
+
+[oracle@db-s003hh03d source_primary]$ 
+
+1.1_pre_check_source.sh-----------It will provide general information about source DB
+2.2_create_user_clone.sh-----------User will be created (CDB_REMOTE_USER=c##clonesNDFCOMA)
+3.3_create_migrate_service.sh------Migrate service will be created(PDB_MIGRATE_SERVICE=pdb_NDFCOMA_migrate)
+4.4_open_read_only.sh--------------This script will schut down PDB an dopen DB in read only mode
+5.5_start_migrate_service.sh--------It will start the above created migrated service.
+
+3.Then we have to go to Target DB in target_primary (Scripts to run from target primary) and run below scripts in particular order
+
+1.6_create_db_link.sh----------------DB link will be created(CLONE_LINK=clone_NDFCOMA_link)
+2.7_create_pdb.sh--------------------PDB will be craeted on target Db using DB link(this script takes time,Depending upon size of DB)
+3.8_pdb_info.sh---------------------.It will provide new Created PDB and its state(will be in mount stage)
+4.9_prepare_patch.sh----------------It will Open DB in read write mode
+5.10_check_pdb_violations.sh--------PDB violations will be checked in this step
+6.11_execute_datapatch.sh-----------Datapatch will be applied to PDB.
+7.12_prepare_upgrade.sh------------This script will put DB in migrate mode(You can check by "show pdbs" command) and you have to manually fire catupgrade script for upgrade
+
+Execute below script.
+
+cd $ORACLE_HOME/rdbms/admin
+$ORACLE_HOME/perl/bin/perl catctl.pl -c P_CBPPHTLSM_CBA_20110314_T $ORACLE_HOME/rdbms/admin/catupgrd.sql(30 mins)
+
+8.13_post_pdb.sh:- ----------It will show in DB in read write mode,If DB is read write mode and no error in catupgrd script,then DB is upgraded to 19C.
+9.14_add_service.sh---------All the services will be created mentioned in lat in config script above,If services are not created ,we have to manually create service through srvctl command.
+
+Example:-srvctl add service -s ndfcomas -d s0200t1h -preferred s0200t1h3,s0200t1h4 -pdb P_NDFCOMA_DBFA_21022311_S
+
+4.Change DNS as per target DB host,You need to Modify Cname in ITSSP
+
+The design is that ora-<db>-a => scan listener in site HH
+and that ora-<db>-b => scan listener in site OE
+
+5.Verification:-
+
+a.nslookup tns entry(it should target DB host)
+b. Make client connection like below,if succesfull only then handover to Application team
+
+sqlplus sys@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-cvarcd-a.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=cvarcd))) as sysdba
+
+6.Post steps:-
+
+a.Check pdb is being shown in OEM or not,If its not showing manually add PDB in OEM.
+b.Check backup
+c.Close PDB and stop all services related to upgraded DB in Source .
+
+
+6.Rollback Plan
+
+we can simply shutdown and open source DB which is in read only stage.
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 

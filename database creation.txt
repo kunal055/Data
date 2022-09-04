@@ -1,0 +1,268 @@
+nddbctl create database \
+--oracleHome /u01/app/oracle/product/19.10.0.0/db210119a \
+--createAsContainer \
+--nlsLengthSemantics char \
+--databaseType tiny \
+--databaseUniqueName b5382p1h \
+--useSGAMemory 32gb \
+--useCpuCount 4 \
+--useStorageCapacity 10tb \
+--useStorageIops 100000iops \
+--useStorageBandwidth 1gbps \
+--characterSet AL32UTF8 \
+--nationalCharacterSet AL16UTF16 \
+--runOnNodes db-s011hh03p,db-s011hh04p \
+--installOnNodes db-s011hh01p,db-s011hh02p,db-s011hh03p,db-s011hh04p \
+--prepareAsPrimary \
+--standbyScanListener db-s011oep-scan \
+--standbyDatabaseUniqueName b5382p1o \
+--standbyVip db-s011oe03p-vip.oneadr.local \
+--standbyAsmDataDiskGroup S011OEP_DATA \
+--standbyAsmRecoDiskGroup S011OEP_RECO
+
+
+On Standby-
+Login from grid user and create entry in listener and tnsnames.ora file.
+(SID_DESC =
+      (SID_NAME = b5382p1o3)
+      (ORACLE_HOME = /u01/app/oracle/product/19.10.0.0/db210119a)
+      (GLOBAL_DBNAME = b5382p1o)
+      (ENVS = "TNS_ADMIN=/clustershare/network/admin")
+    )
+    (SID_DESC =
+      (SID_NAME = b5382p1o3)
+      (ORACLE_HOME = /u01/app/oracle/product/19.10.0.0/db210119a)
+      (GLOBAL_DBNAME = b5382p1o_dgmgrl)
+      (ENVS = "TNS_ADMIN=/clustershare/network/admin")
+    )
+  )
+
+================================================================================
+B5382P1O =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oe03p-vip.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1o)
+    )
+  )
+
+B5382P1O_DUP =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oep-scan.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1o_DGMGRL)
+    )
+  )
+
+
+
+B5382P1H =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011hhp-scan)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1h)
+    )
+  )
+
+B5382P1H_DUP =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oe03p-vip.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1h_DGMGRL)
+    )
+  )
+
+
+
+===================================================================================================================================
+primay login by oracle user and make entry in norde.tnsnames.ora file
+
+B5382P1O =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oep-scan)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1o)
+    )
+  )
+
+B5382P1O_DUP =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011oe03p-vip.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1o_DGMGRL)
+    )
+ )
+
+
+B5382P1H =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-s011hhp-scan)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = b5382p1h)
+    )
+ )
+==================================================================================================
+
+SERVICE=b5400p1o ASYNC NOAFFIR
+                                                 SERVICE=b5402p1o ASYNC NOAFFIR
+                                                 M delay=0 reopen=300 net_timeo
+                                                 ut=30 VALID_FOR=(ONLINE_LOGFIL
+                                                 ES,all_roles) DB_UNIQUE_NAME=b
+                                                 5402p1o
+
+
+SERVICE=b5400p1o ASYNC NOAFFIR
+                                                 M delay=0 reopen=300 net_timeo
+                                                 ut=30 VALID_FOR=(ONLINE_LOGFIL
+                                                 ES,all_roles) DB_UNIQUE_NAME=b
+                                                 5400p1o
+
+on primary---
+
+alter system set log_archive_dest_2='service="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=dm16-scan.oneadr.net)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=b7018p1c)(SERVER=DEDICATED)))"','LGWR ASYNC NOAFFIRM db_unique_name="b7018p1c" valid_for=(all_logfiles,primary_role)' sid='*' scope=both;
+
+
+
+
+
+alter system set log_archive_dest_2='service="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-s009oed-scan.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=h0658d1o)(SERVER=DEDICATED)))"','LGWR ASYNC NOAFFIRM db_unique_name="h0658d1o" valid_for=(all_logfiles,primary_role)' sid='*' scope=both;
+
+Alter System Set log_archive_dest_2='service="h0451d1o",ASYNC NOAFFIRM delay=0 optional compression=disable max_failure=0 max_connections=1 reopen=300 db_unique_name="h0451d1o" net_timeout=30,valid_for=(online_logfile,all_roles) service="h0451d1o", ASYNC NOAFFIRM delay=0 optional compression=disable max_failure=0 max_connections=1 reopen=300 db_unique_name="h0451d1o" net_timeout=30,valid_for=(online_logfile,all_roles)' scope=both sid='*';
+
+Alter System Set log_archive_dest_2='service="b5382p1o ", ASYNC NOAFFIRM delay=0 optional compression=disable max_failure=0 max_connections=1 reopen=300 db_unique_name="b5382p1o " net_timeout=30,valid_for=(online_logfile,all_roles) service="b5382p1o ", ASYNC NOAFFIRM delay=0 optional compression=disable max_failure=0 max_connections=1 reopen=300 db_unique_name="b5382p1o " net_timeout=30,valid_for=(online_logfile,all_roles)' scope=spfile sid='*';
+alter system set log_archive_dest_2='service="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-s009oe02d-vip.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=h0658d1o)(SERVER=DEDICATED)))"','LGWR ASYNC NOAFFIRM db_unique_name="h0658d1o" valid_for=(all_logfiles,primary_role)' sid='*' scope=both;
+Alter System Set log_archive_config='DG_CONFIG=(h0658d1o,h0658d1h)'scope=both SID='*';
+
+Alter System Set log_archive_dest_2='SERVICE=h0658d1o  ASYNC NOAFFIRM delay=0 reopen=300 net_timeout=30 VALID_FOR=(ONLINE_LOGFILES,all_roles) DB_UNIQUE_NAME=h0658d1o'  SID='*' scope=both;
+Alter System Set fal_client='h0658d1h' scope=both SID='*';
+Alter System Set fal_server='h0658d1o' scope=both SID='*';
+Alter Database FORCE LOGGING;
+
+
+cretae pfile from spfile
+transfer pfile and spfile to standby server dbs directory
+make changes in pfile(change dbname)
+*.db_file_name_convert='+S010HHP_DATA','+S010OEP_DATA'
+*.log_file_name_convert='+S010HHP_RECO','+S010OEP_RECO'
+set enviorment on standby
+export ORACLE_SID=b5377p1o3
+export ORACLE_UNQNAME=b5377p1o
+export ORACLE_HOME=/u01/app/oracle/product/19.10.0.0/db210119a
+export TNS_ADMIN=/clustershare/network/admin
+startup nomount
+connect rman
+connect auxiliary sys@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-s009oe02d-vip.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(UR=A)(SID=h0658d1o)))
+
+export ORACLE_SID=b5382p1o3
+export ORACLE_UNQNAME=b5382p1o
+export ORACLE_HOME=/u01/app/oracle/product/19.10.0.0/db210119a
+export TNS_ADMIN=/clustershare/network/admin
+
+
+connect target sys@h0658d1h
+Pony2last4ever
+
+=====================================================================================================================================================
+
+
+PDB Creation
+
+nddbctl create pdb \
+--pdbFreeName WHATEP \
+--pdbApplicationCode WH \
+--pdbEnvironment p \
+--databaseUniqueName b5382p1h \
+--useSGAMemory 4gb \
+--useCpuCount 2 \
+--useStorageCapacity 1tb \
+--useStorageIops 40000iops \
+--useStorageBandwidth 1gbps \
+--pdbPrimaryServicename WHATEP \
+--pdbStandbyServicename WHATEP_ro \
+--useNodes 1
+
+
+
+create spfile='S009OE_DATA' from pfile;
+
+From asmcmd-
+pwcopy --dbuniquename h0658d1o /u01/app/oracle/product/19.9.0.0/db201020g/dbs/orapwh0658d1o +S009OED_DATA/h0658d1o/PASSWORD
+
+S010OEP_DATA/b5377p1o/PASSWORD
+
+
+srvctl add database -db h0658d1o  -oraclehome /u01/app/oracle/product/19.9.0.0/db201020g -spfile +S009OED_DATA/h0658d1o/PARAMETERFILE/spfile.7453.1096966963 -pwfile +S009OED_DATA/h0658d1o/PASSWORD/pwdh0658d1o.7454.1096967161 -dbtype RAC -role PHYSICAL_STANDBY -startoption "read only" -stopoption immediate -dbname h0658d1o  -diskgroup S009OED_DATA,S009OED_RECO
+
+
+
+srvctl add instance -d h0658d1o  -i h0658d1o -node db-s009oe02d
+srvctl add instance -d b5382p1o -i b5382p1o4 -node db-s011oe04p
+
+
+
+
+
+srvctl add service -s rman_b5380p1o -d b5380p1o -preferred b5380p1o3
+
+srvctl add service -s whatep_ro -d b5382p1o -preferred b5382p1o3
+srvctl add service -s whatep -d b5382p1o -preferred b5382p1o3
+
+srvctl add service -s s_whatep_wh_21101519_p -d b5382p1o -preferred b5377p1o3
+
+srvctl add service -s gobirrt -d h0650d1o -preferred h0650d1o1,h0650d1o4 -pdb P_GOBIRR_GSIP_21110312_T
+srvctl add service -s FACAML01P_ro -d h5066p1o -preferred h5066p1o1,h5066p1o2 -pdb P_FACAML01_ARD291_21120913_P -role PHYSICAL_STANDBY
+
+
+
+
+
+
+Create Configuration b5402p1h_dg as Primary Database is b5402p1h Connect Identifier is b5402p1h;
+
+
+
+
+Add Database cbpp3c as Connect Identifier is "cbpp3c" Maintained as Physical;
+
+
+
+alter system set log_archive_dest_2='' scope=both sid='*';
+
+
+Show Configuration;
+Show Database Verbose b5380p1o;
+
+
+
+Database has been migrated to SOP and awaits to be decommissioned . once decommissioned alert will cleared.
+
+
+
+cbpp3c =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dm16db05-vip.oneadr.net)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = cbpp3c)
+    )
+  )
+
+
+    (SID_DESC =
+      (SID_NAME = cbpp3c5)
+      (ORACLE_HOME = /u01/app/oracle/product/12.1.0.2/db201020b)
+      (GLOBAL_DBNAME = cbpp3c)
+      (ENVS = "TNS_ADMIN=/clustershare/network/admin")
+
+
+
+
+
+

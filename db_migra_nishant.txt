@@ -1,0 +1,130 @@
+s0094t1o--pspmct-CRQ001000190166-8g,2- s_pspmc_pspm_19112213_t
+s0094t1o--s_pspma_pspm_19112213_t-CRQ001000190057-8g,2-pspmat
+
+
+/u01/app/oracle/product/19.10.0.0/db210119a
+
+
+db-s006hhp-scan.oneadr.net
+
+
+
+nddbctl create database \
+--oracleHome /u01/app/oracle/product/19.10.0.0/db210119a \
+--createAsContainer \
+--nlsLengthSemantics char \
+--databaseType tiny \
+--databaseUniqueName s0187t1h \
+--useSGAMemory 128gb \
+--useCpuCount 16 \
+--useStorageCapacity 10tb \
+--useStorageIops 100000iops \
+--useStorageBandwidth 1gbps \
+--characterSet AL32UTF8 \
+--nationalCharacterSet AL16UTF16 \
+--runOnNodes db-s008hh04d \
+--installOnNodes db-s008hh01d,db-s008hh02d,db-s008hh03d,db-s008hh04d \
+
+
+
+CDB_SOURCE=b5245p1o
+CDB_TARGET=b5429p1h
+CDB_RUNNING_INSTANCES=b5245p1o3
+CDB_MIGRATE_SERVICE=b5245p
+CDB_REMOTE_USER=c##clonesvcep
+CLONE_LINK=clone_vcep_link
+VIP=db-s011oe03p-vip.oneadr.net
+
+PDB_SOURCE=P_VCE_VCE_21012408_P
+PDB_TARGET=P_VCE_VCE_21012408_P
+PDB_PREFERRED_INSTANCES=b5429p1h3
+PDB_AVAILABLE_INSTANCES=b5429p1h4
+PDB_MIGRATE_SERVICE=pdb_vcep_migrate
+PDB_PRIMARY_SERVICE=vcep
+PDB_STANDBY_SERVICE=vcep_ro
+PDB_NODBOT_SERVICE=s_vce_vce_21012408_p
+
+after step 12.
+
+cd /u01/app/oracle/product/19.9.0.0/db201020f/rdbms/admin
+
+cd $ORACLE_HOME/rdbms/admin
+
+$ORACLE_HOME/perl/bin/perl catctl.pl -c P_GSI_IRDA_19060710_P catupgrd.sql
+
+
+sqlplus sys@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-ncsat-a.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ncsat))) as sysdba
+ora-obacpred-b.qaoneadr.local
+
+
+db-s007hhd-scan.qaoneadr.local	P_HDP_HDP_22032509_T
+
+
+
+
+WARNING: inbound connection timed out (ORA-3136)
+Tue Jul 05 08:01:21 2022
+Errors in file /ora_diag/diag/rdbms/tw3p/tw3p/trace/tw3p_pmon_81222.trc:
+ORA-03170: deadlocked on readable physical standby (undo segment 65535)
+Tue Jul 05 08:01:29 2022
+Errors in file /ora_diag/diag/rdbms/tw3p/tw3p/trace/tw3p_lgwr_81245.trc:
+ORA-04021: timeout occurred while waiting to lock object
+LGWR (ospid: 81245): terminating the instance due to error 4021
+Tue Jul 05 08:01:29 2022
+opiodr aborting process unknown ospid (101361) as a result of ORA-1092
+Tue Jul 05 08:01:29 2022
+opiodr aborting process unknown ospid (86004) as a result of ORA-1092
+Tue Jul 05 08:01:29 2022
+opiodr aborting process unknown ospid (125657) as a result of ORA-1092
+Tue Jul 05 08:01:29 2022
+ORA-1092 : opitsk aborting process
+Tue Jul 05 08:01:30 2022
+System state dump requested by (instance=1, osid=81245 (LGWR)), summary=[abnormal instance termination].
+System State dumped to trace file /ora_diag/diag/rdbms/tw3p/tw3p/trace/tw3p_diag_81228_20220705080130.trc
+Instance terminated by LGWR, pid = 81245
+Tue Jul 05 10:08:04 2022
+
+
+
+*.control_files='+S011OEP_DATA/B5429P1O/CONTROLFILE/current.7589.1100263791','+S011OEP_DATA/B5429P1O/CONTROLFILE/current.7588.1100263793','+S011OEP_DATA/B5429P1O/CONTROLFILE/current.7588.1100263793','+S011OEP_DATA/B5429P1O/CONTROLFILE/current.7588.1100263793','+S011OEP_DATA/B5429P1O/CONTROLFILE/current.7588.1100263793'
+
+
+
+HDPT.world =
+ sqlplus sys@(DESCRIPTION =
+    (LOAD_BALANCE = OFF)
+    (FAILOVER = ON)
+    (CONNECT_TIMEOUT = 5)
+    (TRANSPORT_CONNECT_TIMEOUT = 3)
+    (RETRY_COUNT = 3 )
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-HDPT-a.qaoneadr.local)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-HDPT-b.qaoneadr.local)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = HDPT)
+      (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+    )
+  ) as sysdba
+#
+# Service description for HDPT_ro
+#
+HDPT_ro.world =
+  (DESCRIPTION =
+    (LOAD_BALANCE = OFF)
+    (FAILOVER = ON)
+    (CONNECT_TIMEOUT = 5)
+    (TRANSPORT_CONNECT_TIMEOUT = 3)
+    (RETRY_COUNT = 3)
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-HDPT-a.qaoneadr.local)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-HDPT-b.qaoneadr.local)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = HDPT_ro)
+      (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+    )
+  )
+(DESCRIPTION =(LOAD_BALANCE = OFF)(FAILOVER = ON)(CONNECT_TIMEOUT = 5)(TRANSPORT_CONNECT_TIMEOUT = 3)(RETRY_COUNT = 3)(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = ora-cormbld-a.qaoneadr.local)(PORT = 1521))(ADDRESS = (PROTOCOL = TCP)(HOST = ora-cormbld-b.qaoneadr.local)(PORT = 1521)))(CONNECT_DATA = (SERVICE_NAME = cormbld)(FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC)))) as sysdba
+
+

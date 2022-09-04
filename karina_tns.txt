@@ -1,0 +1,77 @@
+Prod--
+
+GPEOCP.world =
+  (DESCRIPTION =
+    (LOAD_BALANCE = OFF)
+    (FAILOVER = ON)
+    (CONNECT_TIMEOUT = 5)
+    (TRANSPORT_CONNECT_TIMEOUT = 3)
+    (RETRY_COUNT = 3 )
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCP-a.oneadr.net)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCP-b.oneadr.net)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = GPEOCP)
+      (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+    )
+  )
+#
+# Service description for GPEOCP_ro
+#
+GPEOCP_ro.world =
+  (DESCRIPTION =
+    (LOAD_BALANCE = OFF)
+    (FAILOVER = ON)
+    (CONNECT_TIMEOUT = 5)
+    (TRANSPORT_CONNECT_TIMEOUT = 3)
+    (RETRY_COUNT = 3)
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCP-a.oneadr.net)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCP-b.oneadr.net)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = GPEOCP_ro)
+      (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+    )
+  )
+
+
+
+Test-
+
+GPEOCT.world =
+  (DESCRIPTION =
+    (LOAD_BALANCE = OFF)
+    (FAILOVER = ON)
+    (CONNECT_TIMEOUT = 5)
+    (TRANSPORT_CONNECT_TIMEOUT = 3)
+    (RETRY_COUNT = 3 )
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCT-a.qaoneadr.local)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCT-b.qaoneadr.local)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = GPEOCT)
+      (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+    )
+  )
+#
+# Service description for GPEOCT_ro
+#
+GPEOCT_ro.world =
+  (DESCRIPTION =
+    (LOAD_BALANCE = OFF)
+    (FAILOVER = ON)
+    (CONNECT_TIMEOUT = 5)
+    (TRANSPORT_CONNECT_TIMEOUT = 3)
+    (RETRY_COUNT = 3)
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCT-a.qaoneadr.local)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ora-GPEOCT-b.qaoneadr.local)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = GPEOCT_ro)
+      (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC))
+    )
+  )

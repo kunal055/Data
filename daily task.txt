@@ -1,0 +1,209 @@
+/me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=b0450d ENV_FILE=/me01/oracle/dbadmin/backup/sop_oe_test_19c.cfg TARGET_DATABASE=b0450d1 && /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES CAT_USER=b0450d ENV_FILE=/me01/oracle/dbadmin/backup/sop_oe_test_19c.cfg TARGET_DATABASE=b0450d1 &
+
+MAX(SEQUENCE#)
+--------------
+        436336
+
+ wstcxt
+db-twt-hh1
+db-wstct-oe1
+
+run
+{
+restore archivelog from logseq=673528 until logseq=673541;
+}
+
+run {
+allocate channel c1 type 'sbt_tape';
+restore archivelog from logseq=673528 until logseq=673541;
+release channel c1;
+}
+
+
+
+
+
+                   If you want to restore particular sequence of archivelogs from RMAN tape backup, then follow below steps.
+
+ 
+
+connect target sys/******@CRM_DB
+
+connect catalog RMAN_tst/*****@catdb
+
+
+run
+{
+allocate channel t1 type SBT_TAPE parms 'ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_local.opt)'connect sys/Pony2last4ever@bspp2p;
+restore archivelog from sequence 673546 until sequence 673900;
+release channel t1;
+}
+parms 'ENV=(TDPO_OPTFILE=<TDPO_OPTFILE>)';
+
+EDIT DATABASE 'riskw2p' SET STATE='TRANSPORT-OFF'
+
+
+INC000002322858
+BCK_ORA_NFIRPAP_ARC
+	db-s011hh01p.oneadr.net
+
+t0Bechanged3
+[4:32 AM] Singh, Kuldeep
+find /ora_diag/diag/rdbms/bsppb2p/bsppb2p/trace -mtime +2 -name '*.trm' -exec rm -rf {​​​​​​}​​​​​​ \;
+
+
+
+delete archivelog from sequence 139000 until sequence 140000;
+
+Stop Oracle UC4 jobs for CIBKYCP
+alter pluggable database P_CCDEM_CCDEM_19041112_P storage(maxsize 40T);
+
+
+
+
+
+ DELETE NOPROMPT ARCHIVELOG UNTIL SEQUENCE =147000;
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'SBT_TAPE'
+147483
+Up		db-infop-hh.oneadr.net		
+	Target Information
+select thread#, group#, status from v$log order by 1,2;
++DATAC1/calsps1c/onlinelog/group_19.6607.1085170803
++DATAC1/calsps1c/onlinelog/group_19.6869.1085170805
+ALTER DATABASE CLEAR UNARCHIVED LOGFILE GROUP 5;
+SELECT NAME,
+       (SPACE_LIMIT / 1024 / 1024 / 1024) SPACE_LIMIT_GB,
+         ((SPACE_LIMIT - SPACE_USED + SPACE_RECLAIMABLE) / 1024 / 1024 / 1024) AS SPACE_AVAILABLE_GB,
+       ROUND((SPACE_USED - SPACE_RECLAIMABLE) / SPACE_LIMIT * 100, 1) AS PERCENT_FULL
+  FROM V$RECOVERY_FILE_DEST;
+
+This issue is occurred because standby database is not in sync with primary. I have performed the recovery on standby database. now it is in sync. Issue has been resolved
+
+Alter user td_rm connect through 'proxy';
+
+
+
+userid=system/Tend2last4ever@"(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=db-s007hh04d.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=s_loaniqu_liq_20033011_s)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
+directory=EXP_DIR1
+dumpfile=loaniqt_CRQ001000144340.dmp
+logfile=imp_CRQ001000144340.log
+REMAP_SCHEMA=LOANIQ:LOANIQ
+REMAP_TABLESPACE=LOANIQ_T_256K:LOANIQ_T,LOANIQ_I_256M:LOANIQ_T,LOANIQ_T_8M:LOANIQ_T,LOANIQ_LIQUSERS_T_8M:LOANIQ_T,LOANIQ_I_256M:LOANIQ_I_8M:LOANIQ_T,
+LOANIQ_T_256M:LOANIQ_T,LOANIQ_I_256K:LOANIQ_T,LOANIQ_I_8M:LOANIQ_T
+table_exists_action=replace
+
+
+
+Table-
+
+select * from USER_ROLE_PRIVS where USERNAME='METASTORE';
+select * from USER_TAB_PRIVS where Grantee = 'METASTORE';
+select * from DBA_SYS_PRIVS where USERNAME = 'METASTORE';
+
+SELECT * 
+  FROM DBA_TAB_PRIVS 
+ WHERE GRANTEE = 'METASTORE';
+
+SELECT * 
+  FROM DBA_SYS_PRIVS 
+ WHERE GRANTEE = 'METASTORE';
+
+select * from ROLE_TAB_PRIVS  where grantee='METASTORE';
+
+
+
+GRANTEE    GRANTED_ROLE                   ADM DEL DEF COM INH
+---------- ------------------------------ --- --- --- --- ---
+METASTORE  TECHNICAL_USER_ROLE            NO  NO  YES NO  NO
+
+GRANTEE    PRIVILEGE                                ADM COM INH
+---------- ---------------------------------------- --- --- ---
+METASTORE  CREATE SESSION                           NO  NO  NO
+
+Here is the problem ticket which we are facing the issue from UC4 team. It is in under verification and going to fix that on 23rd Sat 2021.
+These are all due to some patch is updated by UNIX team. Due to that UC4 team not able start agents. It is about to fix ASAP. Below is the PBI details. We are following up. 
+
+Problem Investigation   == PBI000000016942
+
+select count(*), omnibus_flag from converge.corporate_Action_position where corporate_action_id=483640;
+
+Pack2last4ever
+
+
+run
+{
+restore archivelog FROM SEQUENCE 60741 UNTIL SEQUENCE 60953 thread=2;
+}
+
+run
+{
+set archivelog destination to '/ora_backup/rman/arch/';
+restore archivelog from logseq=8619 until logseq=8632 thread=2;
+}
+
+userid=system/Pack2last4ever@niorp
+directory=EXP_DIR
+dumpfile=TAS000000293718.dmp
+logfile=_EXP_TAS000000293718.log
+schemas=IMDB,ARDB
+compression=all
+version=12.2
+
+/dp_pump/oracle/CRQ001000150812
+P_NIOR_NIOR_19041609_P
+h5068p1h
+dm19db03
+Select 'GRANT SELECT ON FCNV.'||Table_Name||' TO Z869323;' 
+From All_Tables Where Owner='FCNV';
+
+BEGIN
+   FOR R IN (SELECT owner, table_name FROM all_tables WHERE owner='ALFAEXTD') LOOP
+      EXECUTE IMMEDIATE 'grant select on '||R.owner||'.'||R.table_name||' to Z006295';
+   END LOOP;
+END;
+/
+
+select * from v$flash_recovery_area_usage;
+
+TAS000000288503
+TAS000000288503
+CRQ001000154292
+s0336t1h
+15G
+alter tablespace TEMP ADD TEMPFILE '+DATA/ACTY2P/TEMPFILE/' size 4GB maxsize unlimited extent management local uniform size 1048576;
+ALTER TABLESPACE NORDEA_SYS_TEMP ADD TEMPFILE '+DATA' SIZE 4G autoextent on next 4G MAXSIZE 16G;
+
+$ sqlplus / as sysdba
+alter system set max_dump_file_size=unlimited;
+alter system set events '1555 trace name errorstack level 3';
+exit
+-- Then, kindly reproduce the error or wait until it recurs.
+-- Whenever error is reported, kindly upload the newly generated trace file.
+
+-- Whenever the needed trace file is generated, you can disable it as follows:
+$ sqlplus / as sysdba
+alter system set events '1555 trace name context off';
+
+SELECT sum(value)/1024/1024 "TOTAL SGA (MB)" FROM v$sga;
+
+8510878826
+
+Database was down due to storage issue on server. Issue has been fixed now and database is now up and running.
+
+create restore point INC000002643878_13_01 guarantee flashback database;
+
+
+/u005/oradata/critp/group1/datafile/ada_t_282.dbf
+alter tablespace ada_t add datafile '/u009/oradata/critp/group2/datafile/ada_t_500.dbf' size 30G;
+
+set pages 5000 lines 200
+col cause for a10
+col name for a10
+  col message for a35 word_wrapped
+  set pagesize 1000
+  select name,cause,type,message,status
+  from PDB_PLUG_IN_VIOLATIONS
+  where name = 'P_CRMAS_CRMAS_19111812_P';
+
+
+

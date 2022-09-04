@@ -1,0 +1,273 @@
+On Primary Server:
+Arsenal2021
+
+h5374p1h
+
+cd ~/.ssh
+select thread#, max(sequence#) "Last Primary Seq Generated" from v$archived_log val, v$database vdb where val.resetlogs_change# = vdb.resetlogs_change# group by thread# order by 1;
+
+On Physical Standby Server:
+
+--Check received log on standby--------
+
+select thread#, max(sequence#) "Last Standby Seq Received" from v$archived_log val, v$database vdb where val.resetlogs_change# = vdb.resetlogs_change# group by thread# order by 1;
+
+--Check applied log on standby------
+
+select thread#, max(sequence#) "Last Standby Seq Applied" from v$archived_log val, v$database vdb where val.resetlogs_change# = vdb.resetlogs_change# and val.applied in ('YES','IN-MEMORY') group by thread# order by 1;
+
+-------Check for GAP on Standby---
+
++ctrc
+select max(sequence#) from v$log_history;
+
+alter database recover managed standby database disconnect from session;
+alter database recover managed standby database cancel;
+
+select process, client_process, thread#, sequence#, status from v$managed_standby;
+
+alter system set log_archive_dest_state_2='ENABLE' sid='*' scope=both;
+alter system set log_archive_dest_state_2=defer sid='*';
+
+create spfile from pfile='/u01/app/oracle/product/19.10.0.0/db210119a/dbs/initb5382p1h3.ora'
+
+srvctl modify database -d b5429p1o -spfile +S011OEP_DATA/b5429p1o/PARAMETERFILE/spfile.7590.1100335853
+
+
+select name, value, unit, time_computed from v$dataguard_stats where name in (‘transport lag’, ‘apply lag’);
+
+exit
+
+set lines 200
+set pages 100
+col "Archive_dest" for a30
+col error for a30
+SELECT INST_ID,DEST_ID "ID",
+STATUS "DB_status",
+DESTINATION "Archive_dest",
+ERROR "Error",log_sequence,applied_scn
+FROM GV$ARCHIVE_DEST where STATUS in ('ERROR','VALID');
+
+h5103p1h,h5103p1o
+h5411p1h,h5411p1o
+h5253p1h,h5253p1o
+
+
+
+SELECT ARCH.THREAD# "Thread", ARCH.SEQUENCE# "Last Sequence Received",
+APPL.SEQUENCE# "Last Sequence Applied", (ARCH.SEQUENCE# - APPL.SEQUENCE#) "Difference" FROM
+(SELECT THREAD# ,SEQUENCE# FROM V$ARCHIVED_LOG WHERE (THREAD#,FIRST_TIME ) IN (SELECT THREAD#,MAX(FIRST_TIME)
+FROM V$ARCHIVED_LOG GROUP BY THREAD#)) ARCH,(SELECT THREAD# ,SEQUENCE# FROM V$LOG_HISTORY WHERE (THREAD#,FIRST_TIME )
+ IN (SELECT THREAD#,MAX(FIRST_TIME) FROM V$LOG_HISTORY GROUP BY THREAD#)) APPL WHERE ARCH.THREAD# = APPL.THREAD# ORDER BY 1;
+
+select name from v$archived_log where (thread#=7 and sequence#=7028)
+
+primary-
+
+select thread#, max(sequence#) "Last Primary Seq Generated"
+from v$archived_log val, v$database vdb
+where val.resetlogs_change# = vdb.resetlogs_change#
+group by thread# order by 1;
+
+standby-
+select thread#, max(sequence#) "Last Standby Seq Applied"
+from v$archived_log val, v$database vdb
+where val.resetlogs_change# = vdb.resetlogs_change#
+and applied='YES'
+group by thread# order by 1;
+
+applied sequnce-
+select thread#, max(sequence#) "Last Standby Seq Applied"
+from v$archived_log val, v$database vdb
+where val.resetlogs_change# = vdb.resetlogs_change#
+and applied='YES'
+group by thread# order by 1;
+
+
+SELECT DESTINATION, STATUS, ERROR FROM V$ARCHIVE_DEST WHERE DEST_ID=2;
+
+select message from v$dataguard_status;
+
+select * from v$archive_gap;
+
+
+-----Check redo received and applied on primary----------
+
+set feedback off 
+set serveroutput on size 1000000 
+set linesize 512 
+set trimspool on 
+begin 
+     for x in ( select a.primary_current1,b.primary_current2,c.Standby_applied1,d.Standby_applied2,e.Standby_applied3,f.Standby_applied4,j.Standby_applied5,k.Standby_applied6, 
+                        (a.primary_current1 - c.Standby_applied1) archive_gap1,(b.primary_current2 - d.Standby_applied2) archive_gap2, 
+                        (a.primary_current1 - e.Standby_applied3) archive_gap3,(b.primary_current2 - f.Standby_applied4) archive_gap4, 
+                        (a.primary_current1 - j.Standby_applied5) archive_gap5,(b.primary_current2 - k.Standby_applied6) archive_gap6,g.DB_UNIQUE_NAME,h.TRA_NAME,l.LTRA_NAME,name from 
+                        (select max(SEQUENCE#) as primary_current1 from gv$archived_log where dest_id=1 and thread#=1) a, 
+                        (select max(SEQUENCE#) as primary_current2 from gv$archived_log where dest_id=1 and thread#=2) b, 
+                        (select max(SEQUENCE#) as Standby_applied1 from gv$archived_log where dest_id=2 and thread#=1 and applied='YES') c, 
+                        (select max(SEQUENCE#) as Standby_applied2 from gv$archived_log where dest_id=2 and thread#=2 and applied='YES') d, 
+                        (select max(SEQUENCE#) as Standby_applied3 from gv$archived_log where dest_id=3 and thread#=1 and applied='YES') e, 
+                        (select max(SEQUENCE#) as Standby_applied4 from gv$archived_log where dest_id=3 and thread#=2 and applied='YES') f, 
+                        (select max(SEQUENCE#) as Standby_applied5 from gv$archived_log where dest_id=4 and thread#=1 and applied='YES') j, 
+                        (select max(SEQUENCE#) as Standby_applied6 from gv$archived_log where dest_id=4 and thread#=2 and applied='YES') k, 
+                        (select DB_UNIQUE_NAME from v$archive_dest where dest_id=2) g, 
+                        (select DB_UNIQUE_NAME as TRA_NAME from v$archive_dest where dest_id=3) h, 
+                        (select DB_UNIQUE_NAME as LTRA_NAME from v$archive_dest where dest_id=4) l, 
+                        (select name from v$database) i ) 
+     loop 
+             dbms_output.put_line( CHR(13) || CHR(10)); 
+                dbms_output.put_line( 'Current archivelog on primary thread1 for database '|| x.name ||' : '||x.primary_current1); 
+                dbms_output.put_line( 'Current archivelog on primary thread2 for database '|| x.name ||' : '||x.primary_current2); 
+                dbms_output.put_line( 'Applied archivelog on standby thread1 for database '|| upper(x.db_unique_name) ||' : '||x.Standby_applied1); 
+                dbms_output.put_line( 'Applied archivelog on standby thread2 for database '|| upper(x.db_unique_name) ||' : '||x.Standby_applied2); 
+                dbms_output.put_line( 'Applied archivelog on LTRA thread1 for database '|| upper(x.LTRA_NAME) ||'    : '||x.Standby_applied5); 
+                dbms_output.put_line( 'Applied archivelog on LTRA thread2 for database '|| upper(x.LTRA_NAME) ||'    : '||x.Standby_applied6); 
+                dbms_output.put_line( 'Applied archivelog on TRA thread1 for database '|| upper(x.TRA_NAME) ||'     : '||x.Standby_applied3); 
+                dbms_output.put_line( 'Applied archivelog on TRA thread2 for database '|| upper(x.TRA_NAME) ||'     : '||x.Standby_applied4); 
+                dbms_output.put_line( 'Total archive gap on standby for thread 1                   : '||x.archive_gap1); 
+                dbms_output.put_line( 'Total archive gap on standby for thread 2                   : '||x.archive_gap2); 
+                dbms_output.put_line( 'Total archive gap on LTRA for thread 1                      : '||x.archive_gap5); 
+                dbms_output.put_line( 'Total archive gap on LTRA for thread 2                      : '||x.archive_gap6); 
+                dbms_output.put_line( 'Total archive gap on TRA for thread 1                       : '||x.archive_gap3); 
+                dbms_output.put_line( 'Total archive gap on TRA for thread 2                       : '||x.archive_gap4); 
+                dbms_output.put_line( CHR(13) || CHR(10)); 
+     end loop; 
+end; 
+/
+
+col name for a10
+col percentage 999.99
+SELECT name, free_mb, total_mb, free_mb/total_mb*100 as percentage FROM v$asm_diskgroup;
+
+-------Identify the missing archive log file-------
+
+SELECT THREAD#, LOW_SEQUENCE#, HIGH_SEQUENCE# FROM V$ARCHIVE_GAP;
+
+
+select recovery_mode from v$archive_dest_status where dest_id = 2;
+
+select process, client_process, thread#, sequence#, status from v$managed_standby;
+
+select * from v$dataguard_stats;
+
+select * from v$logstdby_process;
+
+LCR Cache uses--
+
+select used_memory_size from v$logmnr_session where session_id = (select value from v$logstdby_stats where name = 'SESSION_ID');
+
+Missing archive in primary--
+
+select L.thread#, L.sequence#
+from
+  (select thread#, sequence# from v$archived_log where dest_id=1) L
+    where L.sequence# not in
+       (select sequence# from v$archived_log where dest_id=2 and thread# = L.thread#);
+
+transport and apply lag----
+
+select name, value, unit, time_computed from v$dataguard_stats where name in ('transport lag', 'apply lag');
+
+
+
+—-If found gap
+
+---Step 6: Copy missing archive log file-----
+After identifying a gap (as shown above), the DBA will need to query the primary database to locate the archived redo logs on the primary database. The following query assumes the local archive destination on the primary database is LOG_ARCHIVE_DEST_1:
+
+PRIMARY@MYDB>  SELECT name
+FROM v$archived_log
+WHERE thread# = 1
+AND dest_id = 1
+AND sequence# BETWEEN 20931 and 76922;
+Output:
+/oracle/bases/MYDB/archives/MYDB_0001_0716381751_0000076922.arc
+56027 rows selected.
+
+Step 7: Register archive logfile with standby.
+Copy the above redo log files to the physical standby database and register them using the ALTER DATABASE REGISTER LOGFILE … SQL statement on the physical standby database.
+For example:
+STANDBY@MYDB> ALTER DATABASE REGISTER LOGFILE ‘/oracle/bases/MYDB/archives/MYDB_0001_0716381751_0000076922.arc’;
+
+Step 8: Restart the managed recovery operations.
+— After the redo logs have been registered on the physical standby database, the DBA can restart the managed recovery operations.
+For example, to put the physical standby database into automatic recovery managed mode:
+STANDBY@MYDB> alter database recover managed standby database disconnect from session;
+
+
+list backup of archivelog logseq=517524
+
+restore archivelog from sequence 517524 until sequence 517527;
+
+CONFIGURE ARCHIVELOG DELETION POLICY TO BACKED UP 2 TIMES TO 'DISK';
+
+CONFIGURE ARCHIVELOG DELETION POLICY TO APPLIED ON STANDBY;
+CONFIGURE ARCHIVELOG DELETION POLICY TO APPLIED ON STANDBY;
+
+
+'ENV=(TDPO_OPTFILE=/opt/tivoli/tsm/client/oracle/bin64/tdpo_bsppp_cb.opt)'
+66358
+
+RUN {
+ALLOCATE CHANNEL FOR MAINTENANCE DEVICE TYPE DISK;
+DELETE ARCHIVELOG UNTIL TIME 'SYSDATE -7';
+}
+
+delete archivelog until sequence 87450;
+
+set lines 200 pages 200
+select * from v$recovery_area_usage;
+
+run {
+allocate channel d1 device type disk format '/zfssa/ess01hhp/rmanprod/rman10/twp/%U';
+allocate channel d2 device type disk format '/zfssa/ess01hhp/rmanprod/rman20/twp/%U';
+restore archivelog from logseq=1059752 until logseq=1059762 thread=1;
+release channel d1;
+release channel d2;
+}
+
+
+
+set lines 200
+set pages 100
+col "Archive_dest" for a30
+col error for a30
+SELECT INST_ID,DEST_ID "ID",
+STATUS "DB_status",
+DESTINATION "Archive_dest",
+ERROR "Error",log_sequence,applied_scn
+FROM GV$ARCHIVE_DEST where STATUS in ('ERROR','VALID');
+
+
+
+RUN
+{
+restore archivelog FROM SEQUENCE 80267 UNTIL SEQUENCE  90000;
+}
+
+80267
+
+[4:34 AM] Singh, Balwinder
+set line 1000 pagesize 1000
+select sequence#,thread#,applied,to_char(COMPLETION_TIME,'DD-MONYYYY HH24:MI:SS') TIME from v$archived_log where thread#=1 and COMPLETION_TIME>sysdate-1 order by 1;
+
+SELECT distinct ARCH.THREAD# "Thread", ARCH.SEQUENCE# "Last Sequence Received",
+APPL.SEQUENCE# "Last Sequence Applied", (ARCH.SEQUENCE# - APPL.SEQUENCE#) "Difference"
+FROM
+(SELECT THREAD# ,SEQUENCE# FROM gv$ARCHIVED_LOG WHERE (THREAD#,FIRST_TIME ) IN
+(SELECT THREAD#,MAX(FIRST_TIME) FROM gv$ARCHIVED_LOG GROUP BY THREAD#)) ARCH,
+(SELECT THREAD# ,SEQUENCE# FROM gv$LOG_HISTORY WHERE (THREAD#,FIRST_TIME ) IN
+(SELECT THREAD#,MAX(FIRST_TIME) FROM gv$LOG_HISTORY GROUP BY THREAD#)) APPL
+WHERE
+ARCH.THREAD# = APPL.THREAD#
+ORDER BY 1
+/
+
+alter database recover managed standby database disconnect from session;
+alter database recover managed standby database cancel;
+
+select PROCESS,STATUS,THREAD#,SEQUENCE#,DELAY_MINS,BLOCK#,BLOCKS from gv$managed_standby;
+
+alter system set log_archive_dest_state_2='ENABLE' scope=both;
+alter system set log_archive_dest_state_2=defer;
++S010hhP_RECO/B5183P1H/ARCHIVELOG/2022_05_05
