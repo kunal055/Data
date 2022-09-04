@@ -1,0 +1,227 @@
+Arsenal2021   
+srvctl status service -d lds2p
+              Instance: h0119d1h1 is not running on node db-s003hh01d
+              Instance: h0119d1h2 is not running on node db-s003hh02d
+              Instance: h0119d1h3 is running on node db-s003hh03d
+              Instance: h0119d1h4 is running on node db-s003hh04d
+               Service: h0119d is running on instance(s) h0119d1h3,h0119d1h4
+               Service: h0119d_ro is not running.
+               Service: mlqrd is running on instance(s) h0119d1h4
+               Service: mlqrd_ro is not running.
+               Service: rman_h0119d1h is running on instance(s) h0119d1h3,h0119d1h4
+               Service: s_mlqr_mlqr_19121310_d is running on instance(s) h0119d1h4
+
+	        Instance: h0119d1h1 is not running on node db-s003hh01d
+              Instance: h0119d1h2 is not running on node db-s003hh02d
+              Instance: h0119d1h3 is running on node db-s003hh03d
+              Instance: h0119d1h4 is running on node db-s003hh04d
+               Service: h0119d is running on instance(s) h0119d1h3,h0119d1h4
+               Service: h0119d_ro is not running.
+               Service: mlqrd is running on instance(s) h0119d1h4
+               Service: mlqrd_ro is not running.
+               Service: rman_h0119d1h is running on instance(s) h0119d1h3,h0119d1h4
+               Service: s_mlqr_mlqr_19121310_d is running on instance(s) h0119d1h4
+
+1. Login to ap-njgorcu1d.oneadr.local using your -UDM@qaoneadr.local account
+2. sudo su oracle
+3. pushd /u01/ninjainst/run_rcu/SOP/reference_install
+4. ./do_ref.sh db-s001hh03d.qaoneadr.local 1521 ccdcsb1s Tend2last4ever
+5. pushd /u01/ninjainst/run_rcu/SOP/122140/soa_osb
+./rcu_run_soa.sh db-s001hh03d.qaoneadr.local 1521 ccdcsb1s Tend2last4ever CCDOD01 yX8YBGbw1FjlgYGB
+
+
+srvctl enable database -db orcl12c
+
+srvctl stop instance -d h0119d1h -i h0119d1h4
+srvctl start service -d h0023d1h -s s_gpego_gorm_18111208_d -n db-s001hh02d
+srvctl start  service -d h5063p1o -s h5063p -n db-s003hh04d
+srvctl start  service -d h0119d1h -s mlqrd  -n db-s003hh04d
+srvctl stop  service -d s0006t1h -s wvs -n db-s001hh03d\srvctl  start  service  -s s_abresi_abre_21021110_t
+ srvctl config -db b0150d1h -service arc733d
+srvctl  start  service  -s s_abresi_abre_21021110_t
+srvctl config service -s s4005t -d s0202t1h
+srvctl modify database -d h0033d -i h0111d1h -n node_name
+srvctl modify service -s s4005t -d b0162d1h -i b0162d1h1 -n db-s007hh01d
+
+srvctl modify service -db b0162d1h -service ccdcd -modifyconfig -preferred b0162d1h1 
+
+srvctl config database -db 
+srvctl  start  database -d h0657d1h -i
+ 
+Shared Pool Memory Utilization Report
+Obj mem:  2184044799 bytes
+Shared sql:  1940376598 bytes
+Cursors:  706250 bytes
+Free memory: 411234728 bytes (392.18MB)
+Shared pool utilization (total):  4950153176 bytes (4720.83MB)
+Shared pool allocation (actual):  3388997632 bytes (3232MB)
+Percentage Utilized:  146
+
+PL/SQL procedure successfully completed.
+
+
+
+
+
+           Instance: h0039d1h1 is running on node db-s001hh01d
+              Instance: h0039d1h2 is not running on node db-s001hh02d
+              Instance: h0039d1h3 is not running on node db-s001hh03d
+              Instance: h0039d1h4 is running on node db-s001hh04d
+               Service: ccdcsbd is running on instance(s) h0039d1h1
+               Service: ccdcsbd_ro is not running.
+               Service: h0039d is running on instance(s) h0039d1h1,h0039d1h4
+               Service: h0039d_ro is not running.
+               Service: rman_h0039d1h is running on instance(s) h0039d1h1,h0039d1h4
+               Service: s_ccdcsb_ccdcsb_19012409_d is running on instance(s) h0039d1h1
+
+
+alter pluggable database <PDB_NAME> close immediate instances=ALL;
+alter pluggable database <PDB_NAME> open instances=ALL;
+alter pluggable database <PDB_NAME> close instances=('INST1');
+
+
+srvctl status database -db h0052d1o -mount
+
+
+I have contacted to sive, why he has marked status in pending status. He is saying he will  confirm from his team.
+
+
+
+srvctl stop service -d h0039d1h1  -s s_ccdcsb_ccdcsb_19012409_d
+srvctl stop service -d h0039d1h1  -s ccdcsbd
+
+srvctl stop service -d h0039d1h1  -s h0039dd -n db-s001hh01
+
+
+srvctl start  service -d s0007t1o  -s s_hjmap_arc612_19032511_t db-s002oe02d
+    
+
+srvctl stop service -d h0039d1h  -s s_ccdcsb_ccdcsb_19012409_
+
+srvctl stop service -d h0039d1h  -s ccdcsbd
+
+srvctl stop service -d h0039d1h  -s h0039dd -n db-s001hh01d
+srvctl stop service -d h0114d1h  -s h0114d -n db-s003hh02d
+
+srvctl stop instance -d h0039d1h -i h0114d1h
+srvctl  status -db h0071d1o -instance  h0071d1o1
+srvctl start instance -db h0071d1o -instance "h0071d1o1,h0071d1o4"
+
+srvctl start instance -db h0114d -i  h5028p1h1
+srvctl stop service -d h5028p1h1 -s twarp -n  db-s005hh01p
+srvctl stop service -d h5028p1h -s s_twar_tgl_19080411_p -n  db-s005hh01p
+srvctl stop service -d h5028p1h -s rman_h5028p1h -n  db-s005hh01p
+srvctl stop service -d h5028p1h -s h5028p -n  db-s005hh01p
+srvctl start service -d h0071d1o -s  rman_h0071d1o -n db-s002oe02d
+
+           S
+
+
+    
+srvctl stop service -d h0039d1h1  -s s_ccdcsb_ccdcsb_19012409_d
+srvctl stop service -d h0039d1h1  -s ccdcsbd
+srvctl stop service -d h0039d1h1  -s h0039dd -n db-s001hh01d
+e
+srvctl stop service -d h0039d1h  -s s_ccdcsb_ccdcsb_19012409_d
+srvctl stop service -d h0039d1h  -s ccdcsbd
+srvctl stop service -d s0007t1o  -s s_osbcom_osbcom_19013014_t -n db-s002oe02d
+srvctl stop service -d  h0063d1h  -s  h0056d -n db-s002hh01d
+srvctl stop instance -d h0017d1o -i h0017d1o2   rman_h0017d1o
+
+
+srvctl start service -d s0005t1h -s niort
+
+Database name  h5028p host:- db-s005hh01p,db-s005hh04p pdb Read,Write on both nodes
+
+
+srvctl start  instance -db s0005t1h -i  h0056d1h1
+
+
+srvctl status service -d abrep
+srvctl status database -d abrep1
+
+125  crsctl stat res -t
+  126  srvctl status database -d abrep
+  127  srvctl config database -d abrep
+  128  srvctl modify database -d abrep -r 'PHYSICAL_STANDBY'
+  129  srvctl start database -d abrep
+srvctl add service -d abrep -s abred
+srvctl config service -d abrep
+srvctl status service -d abre1p
+[oracle@db-s002hh02d ~]$ srvctl config  service -s tip5t -db s0001t1h
+Service name: tip5t
+Server pool:
+Cardinality: 1
+Service role: PRIMARY
+Management policy: AUTOMATIC
+DTP transaction: false
+AQ HA notifications: false
+Global: false
+Commit Outcome: false
+Failover type:
+Failover method:
+TAF failover retries:
+TAF failover delay:
+Failover restore: NONE
+Connection Load Balancing Goal: LONG
+Runtime Load Balancing Goal: NONE
+TAF policy specification: NONE
+Edition:
+Pluggable database name: P_TIP5_OTC_19123105_T
+Maximum lag time: ANY
+SQL Translation Profile:
+Retention: 86400 seconds
+Replay Initiation Time: 300 seconds
+Drain timeout:
+Stop option:
+Session State Consistency: DYNAMIC
+GSM Flags: 0
+Service is enabled
+Preferred instances: s0001t1h2
+Available instances: s0001t1h3,s0001t1h4,s0001t1h1
+CSS critical: no
+
+
+ srvctl config  service -s tip5t -db s0001t1h
+
+srvctl modify service -d s0001t1h -s tip5t -pdb P_TIP5_OTC_19102321_T  -modifyconfig  -preferred s0001t1h2 -available s0001t1h3,s0001t1h4,s0001t1h1
+ srvctl add service -d s0001t1h -s  tip5t  -pdb P_TIP5_OTC_19102321_T -preferred    s0001t1h2
+
+ srvctl remove service -s tip5t  -db s0001t1h
+
+
+CONFIGURE ARCHIVELOG DELETION POLICY TO APPLIED ON STANDBY;
+DELETE ARCHIVELOG ALL COMPLETED BEFORE 'sysdate-2';
+
+Instance: b0162d1h1 is running on node db-s007hh01d
+              Instance: b0162d1h2 is running on node db-s007hh02d
+              Instance: b0162d1h3 is not running on node db-s007hh03d
+              Instance: b0162d1h4 is not running on node db-s007hh04d
+               Service: b0162d is running on instance(s) b0162d1h1,b0162d1h2
+               Service: b0162d_ro is not running.
+               Service: ccdcd is running on instance(s) b0162d1h1
+               Service: ccdcd_ro is not running.
+               Service: rman_b0162d1h is running on instance(s) b0162d1h1,b0162d1h2
+               Service: s_ccdc_ccdem_19011008_d is running on instance(s) b0162d1h1
+
+srvctl stop service -d  s0202t1o  -s  p_cccaa_cccaa_20091709_t -n db-s007hh02d
+srvctl stop instance -d b0162d1h -i h0017d1o2   rman_h0017d1o
+srvctl stop instance -db b0162d1h  -i  b0162d1h1
+
+
+
+sqlplus  system@(DESCRIPTION=(ENABLE=broken)(ADDRESS=(PROTOCOL=tcp)(HOST=10.96.126.56)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=SARC733D2)))
+
+
+==========================================================================Datbase level  service ==========================================================
+
+BEGIN
+DBMS_SERVICE.stop_service(
+service_name => 'wfp'
+);
+END;
+/
+
+srvctl add service -s s_tiprisk_otc_22080404_p -d b7025p1h -preferred b7025p1h2,b7025p1h3 -pdb P_TIPRISK_OTC_22080404_P
+srvctl add service -s cbpddesd -d b0454d1h -preferred b0454d1h1,b0454d1h2 -pdb P_CBPDDES_CBA_20092213_D -available b0454d1h1,b0454d1h2
+

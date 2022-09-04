@@ -1,0 +1,393 @@
+show parameter resumable_timeout
+
+col OWNER for a30
+col OBJECT_NAME for a40
+select  OWNER,OBJECT_NAME,OBJECT_TYPE from dba_objects where status='INVALID' and  owner='SYS';
+
+select  OWNER,OBJECT_NAME,OBJECT_TYPE from dba_objects where OBJECT_NAME='SECTION';    classification_legislation';
+
+[9/6/21 2:59 PM] Verma, Abhishek
+select DBMS_METADAT.GET_GRANTED_DDL('OBJECT_GRANT','<Username>') from dual;
+
+[9/6/21 2:59 PM] Verma, Abhishek
+SYSTEM_GRANT
+
+[9/6/21 2:59 PM] Verma, Abhishek
+ROLE_GRANT
+
+
+
+ select ptime,ctime from sys.user$ where nAME='G87424';
+
+alter user M662788 identified externally as 'M662788@ONEADR.NET';
+
+alter index CALYPSO.BO_TRANSFER_PERF1 rebuild online parallel 8;
+
+jdbc:oracle:thin:@(DESCRIPTION = (LOAD_BALANCE = OFF) (FAILOVER = ON) (CONNECT_TIMEOUT = 5) (TRANSPORT_CONNECT_TIMEOUT = 3) (RETRY_COUNT = 3 ) (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = ora-cosmost-a.qaoneadr.local)(PORT = 1521)) (ADDRESS = (PROTOCOL = TCP)(HOST = ora-cosmost-b.qaoneadr.local)(PORT = 1521)) ) (CONNECT_DATA = (SERVICE_NAME = cosmost) (FAILOVER_MODE = (TYPE = SELECT)(METHOD = BASIC)) ) )
+
+alter user G39570 identified by Pass234Wed  account unlock;
+alter user N529140 identified externally as  'N529140@ONEADR.NET';
+col username for a30
+set lines 200 pages 200
+select USERNAME,ACCOUNT_STATUS,profile,TEMPORARY_TABLESPACE from dba_users where username like 'CONTROLS;
+
+priceservice
+
+Schema Name CANONICALDATAMODEL
+Password  Poland$654ARC
+Schema Name STAGING
+Password  Ginger#927
+Schema Name COMMONDATAMODEL
+Password Spartan#132
+Schema Name CDMACCESSLAYER
+Password Grace$5678R
+Schema Name DMANALYTICS
+Password Pass456#W123
+
+akhilesh.roy@consult.nordea.com.4555229477.s
+sanambatla.yashaswini@consult.nordea.com.8985489896.s
+karolin.oetzinger@consult.nordea.com.4917611110171.s
++4555229477
+select GRANTEE,GRANTED_ROLE,DEFAULT_ROLE from dba_role_privs where grantee='Z';
+
+create tablespace ADS_T size 10G;
+
+select * from V$RECOVERY_AREA_USAGE;
+
+select sequence#, name,creator, to_char(first_time,'dd-mm-yyyy hh24:mi:ss'), to_char(completion_time,'dd-mm-yyyy hh24:mi:ss')
+from v$archived_log
+where first_time > sysdate- 7
+order by 1
+
+nohup /me01/oracle/dbadmin/backup/db_backup.sh BACKUP_ARCHIVE_ONLY=YES  ORACLE_SERVICE="twmp" &
+
+set lines 100
+col name format a60
+select name,floor(space_limit / 1024 / 1024) "Size MB",ceil(space_used / 1024 / 1024) "Used MB",
+from
+v$recovery_file_dest
+order by
+name;
+Arsenal2021
+col name format a32
+col size_mb format 999,999,999
+col used_mb format 999,999,999
+col pct_used format 999
+
+select
+name,
+ceil( space_limit / 1024 / 1024) size_mb,
+ceil( space_used / 1024 / 1024) used_mb,
+decode( nvl( space_used, 0),0, 0,
+ceil ( ( space_used / space_limit) * 100) ) pct_used
+from
+v$recovery_file_dest
+order by
+name desc;
+
+
+UserID SVC10260  / databases NIORD and NIORS
+
+SVC10260[HELIX_RAW]
+
+set line 200 pages 200
+col tablespace_name for a15
+col username for a17
+col bytes for 9999999
+SELECT * FROM DBA_TS_QUOTAS where username = 'CMTR';
+
+
+9896053139
+
+K048950, Z005953, Z006114
+alter  user  Z000589 identified by Passw234rd;
+INC000002433275
+
+@$ORACLE_HOME/rdbms/admin/awrrpt.sql
+@?/rdbms/admin/awrrpt.sql
+@?/rdbms/admin/sqltrpt.sql
+@$ORACLE_HOME/rdbms/admin/utlrp.sql
+
+col PROXY format a15
+col client format a30
+set lines 200 pages 200
+select * from proxy_users where PROXY='G87424';
+
+ALTER USER ORDT TEMPORARY TABLESPACE TEMP QUOTA 3000M ON TEMP;
+    
+
+QUOTA 5G ON TEMP
+    TEMPORARY TABLESPACE temp_ts
+
+select GRANTEE,OWNER,TABLE_NAME,GRANTOR,PRIVILEGE from  dba_tab_privs where GRANTEE='BRITST_DL_DS';
+select GRANTEE,OWNER,TABLE_NAME,GRANTOR,PRIVILEGE from  dba_tab_privs where TABLE_NAME='DEPOT_EFFEKT_BEHOLD';
+select OWNER,OBJECT_NAME,SUBOBJECT_NAME,STATUS,OBJECT_TYPE  from dba_objects where OBJECT_NAME='APPROVER_DELEGATE';
+
+SELECT A.tablespace_name tablespace, D.mb_total,
+    SUM (A.used_blocks * D.block_size) / 1024 / 1024 mb_used,
+    D.mb_total - SUM (A.used_blocks * D.block_size) / 1024 / 1024 mb_free
+   FROM v$sort_segment A,
+    (
+   SELECT B.name, C.block_size, SUM (C.bytes) / 1024 / 1024 mb_total
+    FROM v$tablespace B, v$tempfile C
+     WHERE B.ts#= C.ts#
+      GROUP BY B.name, C.block_size) D
+    WHERE A.tablespace_name = D.name
+    GROUP by A.tablespace_name, D.mb_total;
+
+TECH_TEMP
+
+SELECT SUM(a.bytes)/1024/1024/1024 as UNDO_SIZE
+FROM v$datafile a,
+v$tablespace b,
+dba_tablespaces c
+WHERE c.contents = 'UNDO1'
+AND c.status = 'ONLINE'
+AND b.name = c.tablespace_name
+AND a.ts# = b.ts#;
+
+
+
+
+select tablespace_name , status , count(*) from dba_rollback_segs group by tablespace_name , status;
+
+select sql_text, sql_fulltext, executions, elapsed_time/1000000 seconds
+from gv$sql
+order by executions desc;
+col 
+SELECT a.username, a.sid, a.serial#, a.osuser, b.tablespace, b.blocks, c.sql_text
+FROM v$session a, v$tempseg_usage b, v$sqlarea c
+WHERE a.saddr = b.session_addr
+AND c.address= a.sql_address
+AND c.hash_value = a.sql_hash_value
+ORDER BY b.tablespace, b.blocks;
+set pages 1000
+set linesize 160
+col file_name for a80
+select file_name, tablespace_name, bytes/1024/1024/1024 "GB", AUTOEXTENSIBLE,MAXBYTES/1024/1024/1024 "MAX_GB" from dba_temp_files;
+
+or
+select a.name,b.name, a.bytes from v$tempfile a, v$tablespace b where a.ts#=b.ts#
+
+
+ps -ef|grep -i oraclebspes*|grep -i LOCAL=NO
+
+
+
+COREINDEX2L                        324560        403     324963          0
+ALTER TABLESPACE Users AUTOEXTEND ON NEXT 1024M maxsize  6000G;
+alter tablespace ORCHESTRATOR_T add datafile '+DATA' size 30G autoextend on next 1024M maxsize 16G;
+alter tablespace  TEMP1  AUTOEXTEND ON NEXT 1024M maxsize  32768G;
+FPINEG_T
+ALTER TABLESPACE CRMDM_RISK_MODEL_OBJ_NON_RET ON NEXT 100M MAXSIZE 4090G;
+alter tablespace COREINDEX2L add datafile '/u002/oradata/wstcxt/group0/datafile/coreindex2l_44.ora' size 30G autoextend on next 1024M;
+
+create tablespace BRITS_DL_TS add datafile '+DATA' size 30G autoextend on next 1024M;
+
+ALTER  temp TABLESPACE  ON NEXT 100M MAXSIZE 4090G;
+alter temp tablespace TECH_TEMP add tempfile '/ora_temp_trmp/tempfile/tech_temp_26.ora' size  64G;
+
+Alter tablespace undodbs1 AUTOEXTEND ON NEXT 1024M maxsize 2048000M;
+
+ alter  tablespace TECH_TEMP add tempfile '/ora_temp_trmp/tempfile/tech_temp_27.ora' size  2M autoextend on next 1024M maxsize  16G;
+
+RCUPRO_IAS_TEMP
+
+autoextend on
+next
+   1m
+maxsize
+   500m;
+
+jdbc:oracle:thin:@
+
+
+(CONNECT_DATA=
+(service_name=SOAS)))
+
+
+jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=ora-soabs.oneadr.net)(PORT=1521)))(CONNECT_DATA=(service_name=SOABS)))
+
+
+
+
+
+
+
+
+
+
+andrzej.pyszynski@nordea.com.
+
+
+
+
+
+
+CRMDM_STAGE_NON_RET
+
+CRMDM_META_NON_RET,
+CRMDM_OB_OBJECTS_NON_RET
+, CRMDM_OB_TRANSF_NON_RET,
+CRMDM_RISK_MODEL_OBJ_NON_RET, 
+CRMDM_STAGE_NON_RET,
+ CRMDM_UDM_OBJECTS_NON_RET,
+ CRMDM_UDM_TRANSF_NON_RET
+alter undo  tablespace  add datafile '/u021/oradata/imp/group3/datafile/undotbs1_14.dbf' size 16G autoextend on next 1024M;
+alter tablespace undo add datafile '+DATA' size 2G autoextend on next 1024M MAXSIZE 250G;
+alter temprary tablespace temp  add tempfile '+DATA' size 16G autoextend on next 1024M;
+alter temp  tablespace 
+alter tablespace TGL_T_256M add datafile '/u001/oradata/group0/datafile/TGL_T_256M_08.dbf' AUTOEXTEND ON NEXT 100M MAXSIZE 30G;
+alter  tablesapce BL_T_256K  add  datafile  '+DATA' size  16G autoextend on next 1024M MAXSIZE 32G;
+ALTER TABLESPACE TGL_T_256M ADD DATAFILE '/u001/oradata/group0/datafile/TGL_T_256M_08.dbf' SIZE 100M AUTOEXTEND ON NEXT 512K MAXSIZE 30G;
+
+ALTER TABLESPACE COREINDEX2S ADD DATAFILE '/u002/oradata/wstcxt/group0//datafile/coreindex2s_07.dbf' size 1024m AUTOEXTEND ON NEXT 100M MAXSIZE 30G;
+alter  tablespace CS_BL_MAP_T add datafile '+DATA' size 16G autoextend on next 1024M;
+set lines 250
+set pages 1000
+Select 'GRANT SELECT ON IIQREPORT.'||Table_Name||' TO  SVC36753;' From All_Tables Where Owner='IIQREPORT';
+INC000003055854
+INC000003054930
+=============================================================================================================================================================
+set pagesize 1000
+SELECT df.tablespace_name "Tablespace",
+  totalusedspace "Used MB",
+  (df.totalspace - tu.totalusedspace) "Free MB",
+  df.totalspace "Total MB",
+  ROUND(100 * ( (df.totalspace - tu.totalusedspace)/ df.totalspace)) "% Free"
+FROM
+  (SELECT tablespace_name,
+    ROUND(SUM(bytes) / 1048576) TotalSpace
+  FROM dba_data_files
+  GROUP BY tablespace_name
+  ) df,
+  (SELECT ROUND(SUM(bytes)/(1024*1024*1024)) totalusedspace,
+    tablespace_name
+  FROM dba_segments
+  GROUP BY tablespace_name
+  ) tu
+WHERE df.tablespace_name = tu.tablespace_name;
+BL_T_256K
+CMTR_I        
+CMTR_T        
+CMTR_T_256M_DS
+CMTR_I_256M   
+CMTR_T_256M   
+select  TABLESPACE_NAME,FILE_NAME,AUTOEXTENSIBLE,BYTES/1024/1024/1024 "GB" from  dba_data_files where tablespace_name='CMTR_I';
+
+ALTER DATABASE DATAFILE '/u01/app/oracle/oradata/DB11G/reclaim01.dbf' RESIZE 24M;
+alter database datafile '+DATA/TDW2P/3DA5FA21ED1032AFE0531A4A350A77DE/DATAFILE/bl_nrt_bo_trade_t.498.1070614315' RESIZE 28G;
+alter database tempfile 'C:\APP\ADMINISTRATOR\ORADATA\PROTECT\TEMP01.DBF' autoextend on;
+
+SELECT name, bytes/1024/1024/1024  AS size_GB FROM   v$datafile WHERE  name LIKE 'BL_NRT_BO_TRADE_T';
+
+select sum(bytes/1024/1024) from dba_segments;
+select
+   sum(bytes)/1024/1024/1024 as size_in_gig,
+   segment_type
+from
+   dba_segments
+where
+   owner='STAGING_MASK_1'
+group by
+   segment_type;
+
+db$trail
+nordea$history
+
+
+col  file_name for a80
+select FILE_NAME,TABLESPACE_NAME,AUTOEXTENSIBLE,BLOCKS/1024/1024 "MB" from  dba_data_files  where TABLESPACE_NAME like '%TEMP%';
+col  file_name for a80
+select FILE_NAME,TABLESPACE_NAME,AUTOEXTENSIBLE,BYTES/1024/1024/1024 "GB" , MAXBYTES/1024/1024/1024 "MAX_GB"  from  dba_data_files  where TABLESPACE_NAME like  'users';
+
+==================================================PDB
+
+col NAME format a30
+select name, max_size/1024/1024/1024 MAX_GB, TOTAL_SIZE/1024/1024/1024 Current_GB from v$pdbs order by name;
+
+select PROPERTY_VALUE FROM database_properties WHERE property_name = 'MAX_PDB_STORAGE';
+
+ALTER PLUGGABLE DATABASE P_CIBKYC_AYC_21021209_D STORAGE (MAXSIZE 4500G);
+
+ALTER PLUGGABLE DATABASE STORAGE (MAXSIZE 4500G);
+=================================USER Details =================================
+select DISTINCT(GRANTEE) from dba_role_privs where GRANTEE in (select username from dba_users);
+
+select DISTINCT(proxy) from proxy_users;
+
+select DISTINCT(GRANTEE) from dba_tab_privs where GRANTEE in(Select username from dba_users) and TABLE_NAME in (select table_name from dba_tables);
+
+
+
+
+=================================================================
+nohup expdp parfile=GOTC_TRADE_LEG.par &
+
+nohup expdp  parfile=exp_niord_schemasTAS000000247269.par &
+
+userid=system/Deep2last4ever@"
+userid=system/Deep2last4ever@"(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=db-s001hh02d.qaoneadr.local)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=s_nior_nior_18121115_d)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
+schemas=(IMDB,ARDB)
+directory=TEMP_EXP_DIR
+dumpfile=exp_niord_TAS000000247269_%U.dmp
+logfile=exp_niord_TAS000000247269.log
+parallel=2
+
+
+
+jdbc:oracle:thin:@(description_list=(description=(source_route=yes)(address_list=(address=(protocol=tcp)(host=ap-isoracm1t.oneadr.net)(port=1950))(address=(protocol=tcp)(host=ap-isoracm2t.oneadr.net)(port=1950)))(address=(protocol=tcp)(host=ora-ldss-a.qaoneadr.local)(port=1521))(connect_data=(server=dedicated)(service_name=ldss)))(description=(source_route=yes)(address_list=(address=(protocol=tcp)(host=ap-isoracm1t.oneadr.net)(port=1950))(address=(protocol=tcp)(host=ap-isoracm2t.oneadr.net)(port=1950)))(address=(protocol=tcp)(host=ora-ldss-b.qaoneadr.local)(port=1521))(connect_data=(server=dedicated)(service_name=ldss))))
+
+SELECT DBMS_METADATA.GET_DDL('DB_LINK','TEST','ARBOR') FROM DUAL;
+
+
+
+SELECT DBMS_METADATA.GET_granted_DDL('TABLESPACE_QUOTA','ARBOR') FROM dual;
+
+
+
+SELECT DBMS_METADATA.GET_DDL('TABLESPACE', tablespace_name) FROM DBA_tablespaces;
+
+
+
+SELECT substr(DBMS_METADATA.GET_DDL('USER', username),1,255) FROM DBA_users;
+
+
+
+SELECT dbms_metadata.get_ddl('ROLE', 'DBA') FROM DUAL
+
+
+
+SELECT dbms_metadata.get_granted_ddl('ROLE_GRANT','DBA') from dual;
+
+
+
+---------------------------------------------
+select dbms_metadata.get_ddl( 'USER', 'ARBOR' ) from dual
+UNION ALL
+select dbms_metadata.get_granted_ddl( 'SYSTEM_GRANT', 'ARBOR' ) from dual
+UNION ALL
+select dbms_metadata.get_granted_ddl( 'OBJECT_GRANT', 'ARBOR' ) from dual
+UNION ALL
+select dbms_metadata.get_granted_ddl( 'INDEX', 'AIDX_QUOTES_SEGMENT_50' ) from dual
+union all
+select dbms_metadata.get_granted_ddl( 'TABLESPACE_QUOTA', 'ARBOR' ) from dual
+---------------------------------------------
+
+
+
+set long 200000000
+
+select dbms_metadata.get_ddl('INDEX','IDX_QUOTES_SEGMENT_50','CRMAS_UDM_CDS') from dual;
+
+select dbms_metadata.get_dependent_ddl( 'OBJECT_GRANT', 'EMP', 'SCOTT' ) from
+dual;
+
+
+select DISTINCT(GRANTEE) from dba_role_privs where GRANTEE in (select username from dba_users);
+
+select DISTINCT(proxy) from proxy_users;
+
+select DISTINCT(GRANTEE) from dba_tab_privs where GRANTEE in(Select username from dba_users) and TABLE_NAME in (select table_name from dba_tables);
+
+SELECT DBMS_METADATA.GET_DDL('VIEW','<>','<OWNER>) from dual;
